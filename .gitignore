@@ -1,0 +1,59 @@
+# ============================================================
+# Pastas de dados pesadas (n\u00e3o versionar)
+# ============================================================
+1_fontes/
+3_planet_orders/
+4_analise_comparativa/
+5_base_final/
+6_gfw/
+7_exploratorio/
+
+# Pasta de apresenta\u00e7\u00f5es (arquivos bin\u00e1rios pesados)
+apresentacoes/
+
+# Pasta vazia (projeto dedicado)
+Projeto Dedicado - TG Pistas de Pouso/
+
+# ============================================================
+# Arquivos de sess\u00e3o e tempor\u00e1rios do R / RStudio
+# ============================================================
+.Rproj.user/
+.Rhistory
+.RData
+.RDataTmp
+.Ruserdata
+*.Rproj.user
+*.Rhistory
+*.RData
+
+# ============================================================
+# Arquivos tempor\u00e1rios do Office (lock files)
+# ============================================================
+~$*.xlsx
+~$*.xls
+~$*.pptx
+~$*.ppt
+~$*.docx
+~$*.doc
+
+# ============================================================
+# Arquivos de sistema
+# ============================================================
+desktop.ini
+.DS_Store
+Thumbs.db
+
+# ============================================================
+# Rasters e arquivos GIS muito pesados (por extens\u00e3o)
+# ============================================================
+*.tif
+*.tiff
+*.img
+
+# ============================================================
+# Arquivos comprimidos (geralmente dados brutos)
+# ============================================================
+*.zip
+*.tar.gz
+*.7z
+*.rar
