@@ -1,4 +1,5 @@
 library(spatialEco)
+library(ggspatial)
 library(ggplot2)
 library(openxlsx)
 library(mapview)
@@ -58,6 +59,12 @@ GFW <- GFW_raw %>%
 #   Como calcular a direção da pista? -> PCA
 #   Quando calculado adionar uma coluna com essa direção no dotted
 
+GFW_raw <- read_sf("6_gfw/GFW_dist.gpkg")
+Deter_before <- read_sf("7_alertas_before/deter_dist.gpkg") %>% dplyr::filter(doy < "2019-01-02")
+base_pistas <- read_sf("5_base_final/base_pistas_final.gpkg", layer="pontos")
+
+GFW <- bind_rows(GFW_raw, Deter_before)
+
 pistas_polig <- read_sf("5_base_final/base_pistas_final.gpkg", layer="poligonos")
 pistas_ponto <- read_sf("5_base_final/base_pistas_final.gpkg", layer="pontos")
 
@@ -87,7 +94,7 @@ pistas_ponto$pista_dir <- sapply(pistas_polig %>% st_transform(31981) %>% st_geo
 # Centroides do GFW
 GFW_c <- GFW %>% mutate(centroid = st_centroid(geom))
 
-buffer_lim <- 7000
+buffer_lim <- 6000
 
 nearest <- st_nearest_feature(GFW_c %>% st_transform(31981), pistas_ponto %>% st_transform(31981))
 
@@ -95,8 +102,6 @@ GFW_pp <- GFW_c %>%
   st_transform(31981) %>% 
   mutate(pista_proxima = as.factor(pistas_ponto$id_pista[nearest])) %>% 
   st_transform(4674)
-
-coords_gfw <- st_coordinates(GFW_pp$geom %>% st_transform(31981))
 
 moda <- function(x) {
   x <- na.omit(x)
@@ -107,14 +112,9 @@ moda <- function(x) {
   factor(names(tab)[which.max(tab)], levels = levels(x))
 }
 
-rios <- read_sf("5_base_final/hidrografia.gpkg") %>% st_transform(4674)
+rios <- read_sf("5_base_final/curso_dagua.gpkg") %>% st_transform(4674)
 
-cores_dark2 <- brewer.pal(8, "Dark2")
-
-# Adiciona 3 cores manualmente
-cores_expandidas <- c(cores_dark2, "#1A237E", "#B71C1C", "lightgreen")
-
-for (i in ids) {
+for (i in pistas_ponto$id_pista[144:length(pistas_ponto$id_pista)]) {
   cat("\n============================\n")
   cat("Iniciando ID:", i, "\n")
   
@@ -122,45 +122,55 @@ for (i in ids) {
   
   cat("→ Filtrando pista\n")
   pista_pt      <- pistas_ponto %>% filter(id_pista == i) %>% st_transform(31981)
-  pista_dir_val <- pista_pt$pista_dir
+  # pista_dir_val <- pista_pt$pista_dir
   
   cat("→ Calculando distância\n")
-  GFW_pp$dist <- as.numeric(st_distance(GFW_pp$geom, pista_pt %>% st_transform(4674)))
+  
+  GFW_filtered <- GFW %>%
+    filter({
+      p <- across(starts_with("pista_")) %>% as.matrix()
+      d <- across(starts_with("dist_"))  %>% as.matrix()
+      rowSums((p == id) & (d <= 6000), na.rm = TRUE) > 0
+    })
+  
+  GFW_filtered$dist <- as.numeric(st_distance(GFW_filtered$geom, pista_pt %>% st_transform(4674)))
+  GFW_filtered$doy <- as.Date(GFW_filtered$doy)
   
   cat("→ Calculando ângulos\n")
   coords_pt  <- st_coordinates(pista_pt)
+  coords_gfw <- st_coordinates(GFW_filtered$geom %>% st_transform(31981))
   
   dx <- coords_gfw[, 1] - coords_pt[1, 1]
   dy <- coords_gfw[, 2] - coords_pt[1, 2]
   
-  GFW_pp$angulo <- atan2(dy, dx) * 180 / pi
-  GFW_pp$angulo[GFW_pp$angulo < 0] <- GFW_pp$angulo[GFW_pp$angulo < 0] + 360
+  GFW_filtered$angulo <- atan2(dy, dx) * 180 / pi
+  GFW_filtered$angulo[GFW_filtered$angulo < 0] <- GFW_filtered$angulo[GFW_filtered$angulo < 0] + 360
   
-  cat("→ Calculando ângulo relativo\n")
-  GFW_pp$angulo_rel <- (GFW_pp$angulo - pista_dir_val) %% 360
+  # cat("→ Calculando ângulo relativo\n")
+  # GFW_filtered$angulo_rel <- (GFW_filtered$angulo - pista_dir_val) %% 360
   
   cat("→ Preparando dados para plot\n")
   breaks_dist <- seq(0, buffer_lim, by = 1000)
   
-  GFW_plot_agregado <- GFW_pp %>%
+  GFW_plot_agregado <- GFW_filtered %>%
     st_drop_geometry() %>%
     filter(dist <= buffer_lim) %>%
     mutate(
-      ang_bin  = cut(angulo_rel, breaks = seq(0, 360, by = 15), 
+      ang_bin  = cut(angulo, breaks = seq(0, 360, by = 15), 
                      labels = paste0(seq(0, 345, 15), "°"), include.lowest = TRUE),
       dist_bin = cut(dist, breaks = breaks_dist, include.lowest = TRUE)
     ) %>%
     group_by(ang_bin, dist_bin) %>%
-    summarise(area_total = sum(area), data = mean(doy), pp = moda(pista_proxima), .groups = "drop") %>%
+    summarise(area_total = sum(area), data = mean(doy), pp = moda(pista_1), .groups = "drop") %>%
     complete(ang_bin, dist_bin, fill = list(area_total = 0))
   
   cat("→ Preparando hidrografia\n")
   
-  # Recorta rios dentro do buffer
   buffer_pista <- st_buffer(pista_pt, buffer_lim)
   rios_clip <- st_intersection(rios %>% st_transform(31981), buffer_pista) %>% 
     st_collection_extract("LINE") %>% 
-    st_cast("LINESTRING")
+    st_cast("LINESTRING") %>%
+    st_segmentize(dfMaxLength = 50)   # <-- ÚNICA mudança: densifica a cada 50m
   
   rios_coords <- st_coordinates(rios_clip) %>%
     as.data.frame() %>%
@@ -170,17 +180,60 @@ for (i in ids) {
       dist    = sqrt(dx^2 + dy^2),
       angulo  = atan2(dy, dx) * 180 / pi,
       angulo  = ifelse(angulo < 0, angulo + 360, angulo),
-      ang_rel = (angulo - pista_dir_val) %% 360,
-      x_plot  = ang_rel / 15 + 1
+      # ang_rel = (angulo - pista_dir_val) %% 360,
+      x_plot  = angulo / 15 + 1,
+      # [MUDANÇA 1] limite do wrap: 24 -> 24.5
+      # garante x_plot ∈ [0.5, 24.5] = mesmo range das colunas do geom_col(width=1)
+      x_plot  = ifelse(x_plot > 24.5, x_plot - 24, x_plot)
     ) %>%
     group_by(L1) %>%
-    mutate(
-      # Detecta salto angular > 180° entre pontos consecutivos (cruzamento do 0°)
-      salto = abs(x_plot - lag(x_plot, default = first(x_plot))) > 12,
-      # Cria subgrupo novo a cada salto
-      subgrupo = cumsum(salto),
-      grupo = paste(L1, subgrupo, sep = "_")
-    ) %>%
+    group_modify(~ {
+      df <- .x
+      if (nrow(df) < 2) {
+        df$grupo <- paste(.y$L1, 0, sep = "_"); return(df)
+      }
+      dx <- abs(df$x_plot - lag(df$x_plot, default = first(df$x_plot)))
+      salto_idx <- which(dx > 12)
+      if (length(salto_idx) == 0) {
+        df$grupo <- paste(.y$L1, 0, sep = "_"); return(df)
+      }
+      # [MUDANÇA 2] insere pontos virtuais nos limites (24.5 e 0.5)
+      # com dist interpolada, preservando a continuidade do rio onde cruza 0°
+      novos <- list(); sub <- 0L
+      df$subgrupo <- 0L
+      for (i in 2:nrow(df)) {
+        if (i %in% salto_idx) {
+          x_prev <- df$x_plot[i - 1]; x_curr <- df$x_plot[i]
+          d_prev <- df$dist[i - 1];   d_curr <- df$dist[i]
+          if (x_prev > x_curr) {
+            x1_lim <- 24.5; x2_lim <- 0.5
+            dist_total <- (24.5 - x_prev) + (x_curr - 0.5)
+            frac1 <- (24.5 - x_prev) / dist_total
+          } else {
+            x1_lim <- 0.5; x2_lim <- 24.5
+            dist_total <- (x_prev - 0.5) + (24.5 - x_curr)
+            frac1 <- (x_prev - 0.5) / dist_total
+          }
+          d_interp <- d_prev + (d_curr - d_prev) * frac1
+          novos[[length(novos) + 1]] <- data.frame(
+            dist = d_interp, x_plot = x1_lim, subgrupo = sub, .pos = i - 0.6
+          )
+          sub <- sub + 1L
+          novos[[length(novos) + 1]] <- data.frame(
+            dist = d_interp, x_plot = x2_lim, subgrupo = sub, .pos = i - 0.4
+          )
+          df$subgrupo[i] <- sub
+        } else {
+          df$subgrupo[i] <- sub
+        }
+      }
+      df$.pos <- seq_len(nrow(df))
+      out <- bind_rows(df, bind_rows(novos)) %>%
+        arrange(.pos) %>%
+        select(-.pos)
+      out$grupo <- paste(.y$L1, out$subgrupo, sep = "_")
+      out
+    }) %>%
     ungroup()
   
   camada_rios <- geom_path(
@@ -205,9 +258,10 @@ for (i in ids) {
       dist    = sqrt(dx^2 + dy^2),
       angulo  = atan2(dy, dx) * 180 / pi,
       angulo  = ifelse(angulo < 0, angulo + 360, angulo),
-      ang_rel = (angulo - pista_dir_val) %% 360,
-      x_plot  = ang_rel / 15 + 1,
-      id_pista = pistas_clip$id_pista  # para rotular os pontos
+      # ang_rel = (angulo - pista_dir_val) %% 360,
+      x_plot  = angulo / 15 + 1,
+      x_plot  = ifelse(x_plot > 24.5, x_plot - 24, x_plot),   # <-- ÚNICA mudança
+      id_pista = pistas_clip$id_pista
     )
   
   camada_pistas <- list(
@@ -223,77 +277,33 @@ for (i in ids) {
   
   cat("→ Gerando Plot 1\n")
   p1 <- ggplot(GFW_plot_agregado, aes(x = ang_bin, y = 1000, fill = data)) +
-    geom_col(position = "stack", color = "white", linewidth = 0.2) +
-    coord_polar(start = -pi / 2) +
-    scale_y_continuous(breaks = breaks_dist) + 
+    geom_col(position = "stack", color = "white", linewidth = 0.2, width = 1) +
+    coord_polar(start = -pi / 2, direction=-1) +
+    scale_y_continuous(breaks = breaks_dist, limits = c(0, buffer_lim)) + 
     scale_fill_date(
       high = "#33691E",
       low = "#F9FBE7",
       na.value = "white"
     ) +
-    labs(title = paste("Pista", id, "– Distância por Data"),
-         subtitle = "Cada anel representa 1km de distância",
-         fill = "Data", x = NULL, y = "Distância (m)") +
-    theme_minimal()
-  
-  cat("→ Preparando Plot 2\n")
-  GFW_plot_area <- GFW_plot_agregado %>%
-    group_by(ang_bin, dist_bin) %>%
-    summarise(area_total_bin = sum(area_total), .groups = "drop")
-  
-  cat("→ Gerando Plot 2\n")
-  p2 <- ggplot(GFW_plot_area, aes(x = ang_bin, y = 1000, fill = area_total_bin)) +
-    geom_col(position = "stack", color = "white", linewidth = 0.2) +
-    coord_polar(start = -pi / 2) +
-    scale_y_continuous(breaks = breaks_dist) +
-    scale_fill_gradient(low = "#FCE4EC", high = "#880E4F", name = "Área Total", trans="log10", na.value="white") +
-    labs(title = paste("Pista", id, "– Distância por Área Minerada"),
-         subtitle = "Cada anel representa 1km de distância",
-         x = NULL, y = "Distância (m)") +
-    theme_minimal()
-  
-  GFW_plot_id <- GFW_plot_agregado %>%
-    mutate(
-      r_min = as.numeric(str_extract(dist_bin, "(?<=[\\(\\[])[0-9e+.]+")),
-      r_max = as.numeric(str_extract(dist_bin, "[0-9e+.]+(?=\\])"))
-    )
-
-  cat("→ Gerando Plot 3 (Pista Próxima)\n")
-  p3 <- ggplot(
-    GFW_plot_id,
-    aes(xmin = as.numeric(ang_bin) - 0.5,
-        xmax = as.numeric(ang_bin) + 0.5,
-        ymin = r_min,
-        ymax = r_max,
-        fill = as.factor(pp))
-  ) +
-    geom_rect(color = "white", linewidth = 0.2) +
-    coord_polar(start = -pi / 2) +
-    scale_x_continuous(
-      breaks = seq_along(levels(GFW_plot_id$ang_bin)),
-      labels = levels(GFW_plot_id$ang_bin)
-    ) +
-    scale_y_continuous(breaks = breaks_dist, limits = c(0, buffer_lim)) +
-    scale_fill_manual(
-      values   = setNames(cores_expandidas[seq_len(11)],
-                          levels(droplevels(GFW_plot_id$pp))),
-      na.value = "white",
-      name     = "Pista Próxima"
-    ) +
-    labs(title = paste("Pista", id, "– Pista Mais Próxima (Moda)"),
-         subtitle = "Cada anel representa 1km de distância",
-         x = NULL, y = "Distância (m)") +
-    theme_minimal()
+    labs(title = NULL, subtitle = NULL, fill = NULL, x = NULL, y = NULL) +  # remove títulos e eixo y
+    theme_minimal() +
+    theme(
+      legend.position    = "bottom",
+      legend.direction   = "horizontal",
+      legend.key.width   = unit(2.4, "cm"),     # estende a barra
+      legend.key.height  = unit(0.35, "cm"),    # opcional, deixa a barra mais "fina" e elegante
+      legend.box.spacing = unit(0, "pt"),       # remove o espaço padrão entre plot e legenda
+      legend.margin      = margin(t = -10, b = 0, l = 0, r = 0)  # sobe a legenda em direção ao plot
+    ) + 
+    annotation_north_arrow(location = "tl", which_north = "true",
+                           height = unit(1, "cm"), width = unit(1, "cm"),
+                           pad_x = unit(1,"cm"), pad_y = unit(1,"cm"))
   
   cat("→ Salvando imagens\n")
-  ggsave(paste0("6_gfw/images/pista_", id, "_data.png"), p1+camada_rios+camada_pistas, width = 8, height = 6, dpi = 300, bg = "white")
-  ggsave(paste0("6_gfw/images/pista_", id, "_area.png"), p2+camada_rios+camada_pistas, width = 8, height = 6, dpi = 300, bg = "white")
-  ggsave(paste0("6_gfw/images/pista_", id, "_id.png"), p3+camada_rios+camada_pistas, width = 8, height = 6, dpi = 300, bg = "white")
+  ggsave(paste0("6_gfw/all_wind_2/pista_", id, "_data.png"), p1+camada_pistas+camada_rios, width = 8, height = 6, dpi = 300, bg = "transparent")
   
   cat("→ Exibindo plots\n")
   print(p1+camada_rios+camada_pistas)
-  print(p2+camada_rios+camada_pistas)
-  print(p3+camada_rios+camada_pistas)
   
   cat("Finalizado ID:", i, "\n")
 }

@@ -1,21 +1,28 @@
 # ============================================================
-# Pastas de dados pesadas (n\u00e3o versionar)
+# Pastas de dados pesadas (não versionar)
+#
+# Todas as pastas numeradas, exceto 2_base_pistas/, contêm
+# rasters, gpkg multi-GB e produtos intermediários que devem
+# ser regenerados pelos scripts a partir das fontes externas.
 # ============================================================
 1_fontes/
 3_planet_orders/
 4_analise_comparativa/
 5_base_final/
 6_gfw/
+7_alertas_before/
 7_exploratorio/
+8_exploratorio/
+8_bfast_resultados/
 
-# Pasta de apresenta\u00e7\u00f5es (arquivos bin\u00e1rios pesados)
+# Pasta de apresentações (pptx/pdf binários pesados)
 apresentacoes/
 
-# Pasta vazia (projeto dedicado)
+# Pasta vazia (projeto dedicado, ambiente local)
 Projeto Dedicado - TG Pistas de Pouso/
 
 # ============================================================
-# Arquivos de sess\u00e3o e tempor\u00e1rios do R / RStudio
+# Arquivos de sessão e temporários do R / RStudio
 # ============================================================
 .Rproj.user/
 .Rhistory
@@ -27,7 +34,7 @@ Projeto Dedicado - TG Pistas de Pouso/
 *.RData
 
 # ============================================================
-# Arquivos tempor\u00e1rios do Office (lock files)
+# Arquivos temporários do Office (lock files)
 # ============================================================
 ~$*.xlsx
 ~$*.xls
@@ -44,11 +51,24 @@ desktop.ini
 Thumbs.db
 
 # ============================================================
-# Rasters e arquivos GIS muito pesados (por extens\u00e3o)
+# Rasters e arquivos GIS muito pesados (por extensão)
 # ============================================================
 *.tif
 *.tiff
 *.img
+
+# ============================================================
+# Journals e locks de bancos SQLite/GeoPackage
+# ============================================================
+*.gpkg-journal
+*.gpkg-shm
+*.gpkg-wal
+
+# ============================================================
+# Saídas de scripts em workspace raiz (regeneráveis)
+# ============================================================
+/deter_dist.gpkg
+/GFW_final.gpkg
 
 # ============================================================
 # Arquivos comprimidos (geralmente dados brutos)
