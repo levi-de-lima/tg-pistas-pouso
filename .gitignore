@@ -77,3 +77,12 @@ Thumbs.db
 *.tar.gz
 *.7z
 *.rar
+
+# ============================================================
+# GeoPackages pesados na raiz (>100MB, regeneráveis, limite do GitHub)
+# ============================================================
+/Mining_Masked_GFWclass.gpkg
+/mask_gfw.gpkg
+/mask_only_miner_gfw.gpkg
+/mask_union_gfw.gpkg
+/mask_valid_gfw.gpkg

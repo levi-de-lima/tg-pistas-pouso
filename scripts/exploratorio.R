@@ -1,6 +1,10 @@
 library(dbscan)
 library(sf)
 
+GFW_raw <- read_sf("Mining_Masked_GFWclass.gpkg")
+
+GFW_centroids <- GFW_raw %>% mutate(geom = st_centroid())
+
 pistas_ponto <- read_sf("5_base_final/base_pistas_final.gpkg")
 GFW_c <- read_sf("6_gfw/GFW_centroide.gpkg")
 
