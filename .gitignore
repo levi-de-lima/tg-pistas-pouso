@@ -86,3 +86,18 @@ Thumbs.db
 /mask_only_miner_gfw.gpkg
 /mask_union_gfw.gpkg
 /mask_valid_gfw.gpkg
+
+# ---------------------------------------------------------------------------
+# Ramos abandonados e duplicatas, movidos na reorganizacao de set/2026.
+# Nada foi apagado; o conteudo continua em disco, fora do controle de versao.
+# ---------------------------------------------------------------------------
+_arquivo/
+
+# Artefatos de compilacao do LaTeX
+artigo/*.aux
+artigo/*.log
+artigo/*.out
+artigo/*.bbl
+artigo/*.blg
+artigo/*.toc
+artigo/*.synctex.gz

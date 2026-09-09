@@ -1,0 +1,558 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+
+% Core packages
+\usepackage{amsmath,amssymb}
+\usepackage{tikz-cd}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage[round]{natbib}
+
+% Paragraphs
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1\baselineskip}
+
+\title{Spatiotemporal Relationship Between Landing Airstrips and Artisanal Mining in the Brazilian Legal Amazon Using Forest Disturbance Alert Systems}
+\author{Levi de Lima}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Artisanal gold mining, known in Brazil as \textit{garimpo}, grew by 55\% in area between 2018 and 2022, and almost all of that growth sits inside the Amazon biome. Aircraft carry the fuel, the machinery and the crews that sustain it, which makes landing airstrips the visible end of its supply chain. That airstrips and mining sit close together is documented. Whether the airstrip comes first, and by how long, is not. We assembled an inventory of 379 landing airstrips over the 222{,}000 km$^2$ of the Brazilian Legal Amazon with the densest \textit{garimpo}, dated 82 of them individually by visual inspection of the Planet archive between July 2017 and February 2026, and benchmarked nine forest disturbance alert systems against manually delineated reference data to choose the one best suited to detecting mining in that setting. The selected system, filtered for agreement across systems and masked against the non-mining classes of DETER, yields 3.8 million dated mining detections covering 2019 to 2025, extended back to 2016 with DETER mining increments. Assigning every detection to its nearest airstrip within 6 km gives a monthly series of mined area per airstrip, and a paired Wilcoxon signed-rank test compares the twelve months preceding the appearance of each airstrip against the twelve that follow.
+% TODO Levi: uma ou duas frases de resultado aqui, depois de rodar o resultados_novo.R.
+The design measures a change of regime coincident with the airstrip rather than a mechanism, and it puts a number on a relationship that enforcement planning currently treats qualitatively.
+\end{abstract}
+
+\textbf{Keywords:} \textit{garimpo}; artisanal and small-scale mining; clandestine airstrips; forest disturbance alerts; Brazilian Legal Amazon; Tapaj\'os.
+
+\section{Introduction}
+
+Mining is the process of extracting valuable material from the Earth. It divides into two families: surface mining, which works deposits lying close to the surface, and underground mining, which reaches deeper ore bodies. This work deals only with the first, hereafter called simply ``mining.''
+
+Surface operations divide again, this time by scale and by legal standing. Industrial mining runs inside a licensing framework, reports to regulators, employs heavy machinery, and answers to rules on tailings and waste disposal. Artisanal and small-scale mining (ASM), known in the Brazilian Amazon as \textit{garimpo}, works under none of those constraints. Gold is recovered by amalgamation with mercury, and the mercury that escapes the process reaches rivers, fish, and the people who eat them. Among 200 Munduruku participants in three villages of the Tapaj\'os basin, 57.9\% carried hair mercury at or above the 6 $\mu$g/g reference level \citep{basta2021}. In Yanomami villages where mining was active nearby, 92.3\% of participants exceeded that level, with a median of 15.5 $\mu$g/g \citep{vega2018}. Downstream of the villages the same pattern holds for riverine and urban populations, 75.6\% of whom exceeded the safe blood limit in a study spanning the Tapaj\'os \citep{meneses2022}. \citet{escolhas2024} trace where that mercury comes from and how it enters the Amazon in the quantities the activity consumes.
+
+Mining inside Indigenous Lands (ILs) cannot be licensed in Brazil. Article 231, \S3 of the 1988 Constitution makes prospecting and extraction on Indigenous Lands conditional on a specific statute and on authorization by the National Congress, neither of which has ever been enacted, and \S7 of the same article explicitly withholds from Indigenous Lands the provision that elsewhere favors the organization of \textit{garimpeiro} cooperatives \citep{brasil1988}. The activity has nevertheless expanded there. Mining inside Indigenous Lands in the Brazilian Amazon grew from 7.45 km$^2$ in 1985 to 102.16 km$^2$ in 2020, and three ILs, Kayap\'o, Munduruku and Yanomami, concentrated 95\% of it in 2020 \citep{mataveli2022}.
+
+The expansion is recent and it is fast. Between 2018 and 2022 the area under \textit{garimpo} in Brazil grew from 1{,}720 km$^2$ to 2{,}670 km$^2$, an increase of 55\%, while industrial mining moved from 1{,}730 km$^2$ in 2019 to 1{,}800 km$^2$ in 2022, roughly 4\% \citep{ferreiraneto2024}. Almost all of that \textit{garimpo} sits in one biome: 92\% of the area mined by \textit{garimpo} in Brazil in 2022 lay inside the Amazon \citep{mapbiomas2023mineracao}, a figure independently put at 91.75\% by \citet{ferreiraneto2024}. Price is part of the explanation. The LBMA gold price set 53 all-time highs during 2025 and closed the year at an annual average of US\$3{,}431 per ounce, 44\% above the previous year \citep{wgc2026}, and \citet{ferreiraneto2024} tie the mapped expansion directly to that market.
+
+Growth of this kind changes what the activity looks like on the ground. The word \textit{garimpo} still carries its artisanal origins, but high-capacity pumps, hydraulic excavators known locally as ``PCs,'' and landing airstrips are now ordinary features of a mining site in the Amazon. The change matters for detection as much as for enforcement, because mechanized \textit{garimpo} clears forest in patches large enough and fast enough to be caught by satellite monitoring.
+
+Par\'a carries the heaviest share. Four of the five Brazilian municipalities with the largest \textit{garimpo} areas are in that state: Itaituba with 57{,}215 ha, Jacareacanga with 15{,}265 ha, S\~ao F\'elix do Xingu with 8{,}126 ha and Ouril\^andia do Norte with 7{,}642 ha, with Peixoto de Azevedo (Mato Grosso) third at 11{,}221 ha \citep{mapbiomas2022mineracao}. Itaituba and Jacareacanga both sit on the Tapaj\'os, and the Munduruku and Sai Cinza Indigenous Lands fall inside the same basin.
+
+The forest damage does not come only from the pits. It also comes from the logistics that keep them supplied. Roads are absent over most of the region, rivers are slow, and aircraft carry the fuel, the machinery parts, the mercury and the crews. Airstrips are the visible end of that chain. An investigation by The Intercept Brasil with Earthrise Media and The New York Times counted 1{,}269 airstrips in the Legal Amazon with no registration at the Ag\^encia Nacional de Avia\c{c}\~ao Civil (ANAC), more than the 1{,}260 registered ones, and found gold-mining deforestation around 362 of them \citep{intercept2022}. A systematic mapping by MapBiomas identified 2{,}869 airstrips of any legal status in the Amazon, 804 of them inside protected areas and 456 within 5 km of a \textit{garimpo} \citep{mapbiomas2023pistas}. For the Yanomami IL specifically, \citet{furtado2024} reconstruct the network of airstrips and irregular flights that sustained the mining there.
+
+Remote sensing has answered the two halves of this problem separately. On the mining side, near-real-time forest disturbance alert systems now cover the Amazon at several resolutions and revisit rates: DETER at INPE \citep{diniz2015}, the GLAD Landsat alerts \citep{hansen2016}, the Sentinel-1 RADD alerts \citep{reiche2021}, the integrated product that merges the three \citep{reiche2024}, MapBiomas Alerta \citep{mapbiomasalerta}, the TropiSCO family of Sentinel-1 detectors \citep{bouvet2018,ballere2021,mermoz2021} and its operational Brazilian version DETER-R \citep{doblas2024}, along with the annual PRODES series \citep{valeriano2004,assis2019} and the SAD system at Imazon \citep{imazonsad}. These systems say where forest cover was lost and when, but not why, and recent work has begun attributing the driver of each disturbance patch \citep{slagter2023,slagter2026}. On the airstrip side, detection algorithms have been built for optical imagery \citep{pardini2024,pardini2025} and for Sentinel-1 SAR, together with the S1-AAD dataset that supports them \citep{gomes2023,gomes2026}.
+
+What nobody has measured is how the two couple in time. The proximity is documented: 456 airstrips within 5 km of a \textit{garimpo} \citep{mapbiomas2023pistas}, 362 with mining deforestation around them \citep{intercept2022}. Proximity, though, is a snapshot. It does not say whether the airstrip preceded the mining front or followed it, how long the gap was, or whether the mining rate around an airstrip changes once the airstrip is in place. \citet{silva2023} model the drivers of illegal mining on Indigenous Lands and treat infrastructure as one covariate among several, but the question of sequence is left open. Answering it requires two things at once: airstrips dated individually, and a mining time series dense enough to resolve months rather than years.
+
+That is what this work sets out to do. We assemble a temporally indexed inventory of landing airstrips over the part of the Brazilian Legal Amazon with the highest concentration of \textit{garimpo}, dating each airstrip by visual inspection of the Planet archive; we benchmark nine forest disturbance alert systems against manually delineated reference data to choose the one best suited to detecting \textit{garimpo} in that area; and we use the selected system to build a monthly series of mined area around every airstrip, which lets us test whether the appearance of an airstrip marks a change of regime in the mining nearby. A control group of mining detections far from any airstrip provides the counterfactual. The practical payoff is a quantitative statement about how much mining an airstrip is worth and how quickly, which is the kind of number enforcement planning needs and does not currently have.
+
+% TODO Levi: decidir se quer um par\'agrafo final descrevendo a estrutura do artigo
+% (Se\c{c}\~ao 2 metodologia, 3 resultados, 4 discuss\~ao, 5 conclus\~ao).
+% Alguns peri\'odicos pedem, outros acham redundante.
+
+\section{Materials and Methods}
+
+This is an observational study over a fixed geographic window and a fixed observation period. The units of analysis are individual landing airstrips, the exposure is the appearance of the airstrip as read from satellite imagery, and the outcome is the area of mining detected within a defined radius of it in the months before and after. Nothing is randomized and no intervention is assigned, so the design supports a statement about coincidence in time and not about cause. Sections 2.1 to 2.5 describe how each of those quantities was built, and Section 2.6 how they were compared.
+
+\subsection{Study area}
+
+The study area covers 289 tiles of the DETER reference grid arranged as a contiguous 17 $\times$ 17 block, each tile spanning $0.25^\circ \times 0.25^\circ$. The block extends from $58.75^\circ$W to $54.5^\circ$W and from $8.75^\circ$S to $4.5^\circ$S, an area of roughly 222{,}000 km$^2$. It sits over southwestern Par\'a and reaches west into southern Amazonas, and the Tapaj\'os and its tributaries drain most of it. Both the municipalities that Section 1 identifies as carrying the largest \textit{garimpo} areas in the country and several Indigenous Lands fall inside it.
+
+We chose the block as the window of the DETER grid concentrating the largest area of mining alerts in the Brazilian Legal Amazon, so that the analysis would sit where the phenomenon is densest rather than where it is merely present.
+
+% TODO Levi: descrever o crit\'erio exato da sele\c{c}\~ao (foi a janela 17x17 que
+% maximiza \'area de minera\c{c}\~ao DETER? qual per\'iodo do DETER foi usado?). Ver pergunta 13.
+
+\begin{figure}[htbp]
+\centering
+% \includegraphics[width=0.9\textwidth]{figures/study_area.png}
+\caption{Study area: the 17 $\times$ 17 block of DETER tiles, with the airstrip inventory, the hydrography of the Tapaj\'os basin and the Indigenous Lands it contains.}
+\label{fig:study_area}
+\end{figure}
+
+\subsection{Airstrip inventory}
+
+\subsubsection{Sources and consolidation}
+
+We drew airstrips from five independent sources. OpenStreetMap contributed both line and polygon features, extracted from the Geofabrik Brazil download. MapBiomas contributed its Airstrips Mapping Data layer, and the S1-AAD dataset of \citet{gomes2026} a further set built from Sentinel-1 SAR imagery. IBGE contributed the features it catalogues as airstrips in the region. A manual search over Google Satellite imagery then added airstrips that none of the other sources carried.
+
+The same airstrip frequently appears in more than one source, with geometries offset by tens or hundreds of metres. To collapse these duplicates we projected every feature to SIRGAS 2000 / UTM 21S (EPSG:31981), buffered it by 200 m and dissolved the buffers. Each connected component of the dissolved layer defines a cluster, and every original feature belongs to the cluster it intersects. We then reduced each cluster to a single record carrying a stable identifier, the union of the source flags, and the centroid of the combined geometry as its point representation. Table \ref{tab:sources} reports how many of the final airstrips carry each source flag. The flags are not mutually exclusive, so the column sums exceed the number of airstrips.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{lr}
+\hline
+& Airstrips \\
+\hline
+\textit{Provenance (flags overlap)} & \\
+\quad MapBiomas & 355 \\
+\quad S1-AAD (Sentinel-1 SAR) & 191 \\
+\quad OpenStreetMap (lines) & 55 \\
+\quad Manual search over Google Satellite & 52 \\
+\quad OpenStreetMap (polygons) & 20 \\
+\quad IBGE & 7 \\
+\hline
+\textit{Legal status} & \\
+\quad Registered with ANAC & 54 \\
+\quad Not registered & 325 \\
+\hline
+\textit{Dates read from the Planet archive} & \\
+\quad Start date & 82 \\
+\quad Inactivity date & 63 \\
+\quad End date & 40 \\
+\quad At least one date & 124 \\
+\quad A start and an end & 21 \\
+\hline
+\textbf{Total distinct airstrips} & \textbf{379} \\
+\hline
+\end{tabular}
+\caption{The consolidated airstrip inventory. An airstrip present in two or more sources carries two or more provenance flags, so those counts overlap and sum to more than the total. The legal-status and date blocks describe the same 379 airstrips.}
+\label{tab:sources}
+\end{table}
+
+% TODO Levi: confirmar se reporto 379 (base final) ou 372 (n\'umero dos slides).
+% Ver pergunta 5.
+
+\subsubsection{Legal status}
+
+To separate registered airstrips from the rest we crossed the inventory with the ANAC aerodrome registry. We clipped the registry points to the study area, buffered them by 550 m to absorb the coordinate imprecision of the cadastral records, and intersected them with the inventory. An airstrip that meets a registry buffer counts as registered and inherits the official aerodrome name. Of the 379 airstrips, 54 are registered and 325 are not.
+
+Unregistered does not mean clandestine in the strict sense, since the registry has gaps of its own, but it is the operational proxy available and it is the same one used by \citet{intercept2022}.
+
+\subsubsection{Temporal indexing}
+\label{sec:index}
+
+Dating each airstrip is what makes the rest of the analysis possible. We did it by hand. We inspected every airstrip in the inventory in the Planet archive, through the Programa Brasil MAIS platform of the Brazilian Federal Police, which serves Planet imagery at up to 3 m resolution over the Amazon. That archive spans July 2017 to February 2026, and the window bounds everything the study can observe.
+
+We recorded three dates per airstrip, each one where the imagery supports it. The start date is the first image in which the cleared strip is visible, so an airstrip already present in the first available image carries none. The end date is the last image in which the strip still reads as a strip, after which it is overgrown, built over or otherwise gone. The inactivity date is the point from which the strip, still visible, shows no sign of use; where both an end and an inactivity date exist, the analysis takes the earlier of the two as the end of the airstrip's operating life.
+
+% TODO Levi: confirmar as defini\c{c}\~oes acima de end\_date e inop\_date, e confirmar
+% que o fim usado na an\'alise \'e min(end\_date, inop\_date). Ver pergunta 6.
+
+The lower block of Table \ref{tab:sources} reports how many airstrips carry each date. The imbalance is structural rather than accidental. An airstrip opened before July 2017 has no observable start, and one still in use in February 2026 has no observable end. Only the subset carrying a usable date enters the temporal analysis.
+
+Alongside the dates we captured a screenshot of each airstrip over high-resolution imagery for review, and listed the pairs of airstrips closer than 1 km to one another, since those cannot be treated as independent once mining is attributed to the nearest strip.
+
+The consolidated product is a GeoPackage with two layers, one holding the centroid of each airstrip with all attributes and one holding the digitized outline. Everything downstream uses the point layer.
+
+\subsection{Selecting a forest disturbance alert system}
+
+\subsubsection{Candidate systems}
+
+We considered the nine alert systems covering the Brazilian Amazon listed in Table \ref{tab:alerts}. They differ in sensor, in spatial resolution, in revisit frequency and in what they set out to flag, and none of them targets \textit{garimpo} specifically. Choosing among them empirically, rather than by reputation, is therefore a methodological step in its own right.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{lllr}
+\hline
+System & Institution & Sensor & Resolution \\
+\hline
+DETER & INPE & Optical & 60 m \\
+GLAD-S2 & University of Maryland & Optical & 10 m \\
+GFW integrated alerts & World Resources Institute & SAR / Optical & 10--30 m \\
+LUCA & Academic & SAR & 10 m \\
+MapBiomas Alerta & MapBiomas & Optical & 10 m \\
+PRODES & INPE & Optical & 30 m \\
+RADD & Wageningen University & SAR & 10 m \\
+SAD & Imazon & Optical & 30 m \\
+TropiSCO & CESBIO / CNES & SAR & 10 m \\
+\hline
+\end{tabular}
+\caption{Forest disturbance alert systems compared over the reference tile.}
+\label{tab:alerts}
+\end{table}
+
+% TODO Levi: preciso da refer\^encia do LUCA. Nos slides est\'a como "Pesquisa
+% Acad\^emica (2024)". Qual artigo?
+
+\subsubsection{Reference data}
+
+We benchmarked the nine systems over a single tile, C63L51. It carries a dense history of forest disturbance and contains four airstrips, which makes it a small version of the configuration the study is about. Inside it we delineated every mining event by hand on the Planet time series and gave it the date of the image in which it appears. That delineation is the reference the nine systems are measured against. It is not ground truth in the field sense. It inherits the limits of visual interpretation, most of all along river courses, where the boundary between mined ground and natural bank is a judgement call.
+
+\subsubsection{Minimum mapping unit}
+\label{sec:mmu}
+
+Alert systems fragment. A single mining front comes back as dozens of small disjoint polygons, and isolated pixels of noise turn up far from any real disturbance. Compare systems polygon by polygon under those conditions and you measure fragmentation, not detection. We therefore applied the same minimum mapping unit (MMU) to all nine systems. Every feature is first buffered outward by 50 m, which merges anything within 100 m of a neighbour once the buffers are dissolved; the dissolved body is then buffered inward by 50 m, restoring its original extent; and whatever still measures less than 10{,}000 m$^2$ is discarded.
+
+We then keep the original alert polygons that intersect the surviving MMU mask, so the geometry entering the comparison is the system's own with the isolated fragments dropped. The 10{,}000 m$^2$ threshold comes from the reference tile. This filter belongs to the comparison and to nothing else. Section \ref{sec:decode} explains why we do not carry it into the layer the analysis uses.
+
+\subsubsection{Comparison}
+
+We binned every layer, alerts and reference alike, into half-year periods, encoded as year plus $(\text{semester}-1)/2$ with semester 1 covering January to June. The comparison runs over the eleven periods from the first half of 2020 to the second half of 2025. A mining pit does not revert to forest, so we accumulated area forward in time and the geometry of each system at period $t$ is the union of everything it reported up to $t$. Ground cleared before the series starts would otherwise count as new disturbance the first time an alert touches it. To prevent that we seeded the accumulation of every system with PRODES deforestation up to 2019, restricted to the areas the manual reference identifies as mined.
+
+For each system and each period we computed three quantities against the reference:
+
+\begin{align}
+\text{Intersection}_t &= A_t \cap P_t \\
+\text{Omission}_t &= P_t \setminus A_t \\
+\text{Commission}_t &= A_t \setminus P_t
+\end{align}
+
+where $A_t$ is the accumulated alert geometry and $P_t$ the reference geometry at period $t$. Reporting these as rates, $|P_t \setminus A_t| / |P_t|$ for omission and $|A_t \setminus P_t| / |A_t|$ for commission, makes the nine systems directly comparable over the same periods.
+
+The reference is not accumulated, and does not need to be. An alert is an increment, so the alert series has to be summed forward to represent the ground that is open at a given date. A manual delineation is not an increment: the interpreter sees the whole scar in the image and outlines all of it, so each period already carries the full extent. The reference series rises from 206 ha in the first half of 2020 to 761 ha in the first half of 2025, with two reversals of 10\% and 3\% along the way that reflect where the boundary was drawn on a given image rather than any recovery on the ground.
+
+\subsubsection{Outcome}
+
+Table \ref{tab:rates} gives the two rates for the nine systems in the final period of the comparison, alongside their average over the eleven periods.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{lrrrr}
+\hline
+ & \multicolumn{2}{c}{Omission} & \multicolumn{2}{c}{Commission} \\
+System & final & mean & final & mean \\
+\hline
+GFW integrated alerts & 34.5\% & 33.8\% & 31.4\% & 28.2\% \\
+GLAD-S2 & 40.5\% & 37.7\% & 24.2\% & 22.8\% \\
+RADD & 41.7\% & 38.4\% & 23.6\% & 21.6\% \\
+LUCA & 48.2\% & 42.7\% & 11.0\% & 13.0\% \\
+PRODES & 49.8\% & 49.4\% & 12.3\% & 11.5\% \\
+MapBiomas Alerta & 50.0\% & 52.0\% & 10.2\% & 11.9\% \\
+TropiSCO & 52.9\% & 45.1\% & 11.7\% & 14.5\% \\
+SAD & 61.4\% & 58.9\% & 8.8\% & 10.3\% \\
+DETER & 68.4\% & 58.5\% & 19.8\% & 20.6\% \\
+\hline
+\end{tabular}
+\caption{Omission and commission of the nine alert systems against the manual Planet reference in tile C63L51, ordered by omission. Final period is the first half of 2025; the mean runs over the eleven half-year periods from 2020 to 2025.}
+\label{tab:rates}
+\end{table}
+
+No system dominates, and the two rates trade off against each other. The four with the lowest commission miss around half of the reference area, and the systems that find the most also flag the most that is not mining. GFW sits at one end of that trade-off: the lowest omission of the nine at 34.5\%, six points below the next best, and the highest commission at 31.4\%.
+
+We selected GFW on omission alone. The two errors are not symmetric for this study. Mining that a system never flagged cannot be recovered by any amount of downstream processing, whereas disturbance that a system flags but that is not mining can be removed with an independent mask, which is what the next section does. Selecting on total error would have picked LUCA, and its 48\% omission would have been permanent. Commission near 30\% is the highest of the nine but is not large in absolute terms, and it is the error this pipeline can act on.
+
+The benchmark had one job, which was to reduce nine candidates to one. Everything after it improves the selected system rather than reopening the choice. The layer described next is therefore not the layer measured here. It carries two additional filters and spans 2019 to 2025 rather than 2020 to 2025. Table \ref{tab:rates} characterises the candidates at the moment of selection, and the rates of the final series were not remeasured.
+
+\subsection{Building the mining time series}
+
+\subsubsection{Decoding and filtering the alert raster}
+\label{sec:decode}
+
+The raster came from the data repository of the Projeto Dedicado at INPE, the project under which this work sits, rather than from a download of our own. It covers the Brazilian Legal Amazon as a 302{,}129 $\times$ 235{,}105 unsigned 16-bit BigTIFF at 0.0001$^\circ$, close to 11 m at the equator.
+
+Each pixel encodes a confidence class and a date at once. Values in the 30{,}000 range denote high confidence and values in the 40{,}000 range highest confidence, and the remainder of the value is the number of days elapsed since 31 December 2014. We clipped the raster to the study area, discarded everything outside the range 30{,}000 to 45{,}000, which drops the low-confidence class along with the no-data background, and reclassified the survivors to the calendar date they encode. Everything up to vectorization stayed in raster space, which keeps the cost manageable at this extent.
+
+We then applied two masks, in this order.
+
+The first is an agreement mask, built from a companion raster maintained within the Projeto Dedicado that scores each pixel from 1 to 6 by how many alert systems detected disturbance there. We set pixels scoring 1 or 2 to no data and the rest to one, then multiplied that binary mask into the date raster, so a GFW alert survives only where at least three systems saw the same disturbance. It removes 41.7\% of the alert pixels, and what it removes sits in the weaker confidence class: 87.1\% of the highest-confidence pixels survive it against 28.1\% of the high-confidence ones, so the layer shifts from 48.8\% high and 51.2\% highest before the mask to 23.5\% and 76.5\% after. That alignment is expected, since the confidence class GFW assigns is itself a function of how many of its contributing systems agree, and the mask is a stricter version of the same test. Temporal coverage is untouched, 2 January 2019 to the end of 2025 on both sides.
+
+This step is worth naming for what it is. The series analysed below is not GFW alone: it is the subset of GFW alerts that at least two other systems corroborate. That is a stronger detection criterion than any single product provides, and it is also the reason the layer cannot be compared directly against the rates in Table \ref{tab:rates}.
+
+% TODO Levi: falta dizer QUAIS sistemas o raster soma. O texto acima assume que o
+% valor conta concord\^ancia sobre dist\'urbio, n\~ao sobre minera\c{c}\~ao. Se fosse
+% concord\^ancia sobre minera\c{c}\~ao, sobrariam 8.012 km2 com tr\^es ou mais sistemas
+% dizendo "minera\c{c}\~ao", e a m\'ascara do DETER logo depois derrubaria 80,8% disso,
+% o que seria contradit\'orio. Confirmar com o Projeto Dedicado.
+
+The second mask removes disturbance that is not mining. We dissolved every DETER feature in the study area whose class is not MINERACAO into a single multipolygon of 2{,}990 parts and applied it as an inverse mask. The 31{,}748 features behind it are 15{,}874 clear-cut deforestation, 12{,}198 fire scars, 3{,}004 degradation, 407 deforestation over non-forest vegetation, 253 disorganized selective logging and 12 geometric selective logging. This mask removes 80.8\% of what the first one left.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{lrr}
+\hline
+Stage & Share of study area & Area \\
+\hline
+Alerts after the confidence clamp & 6.20\% & 13{,}748 km$^2$ \\
+After the agreement mask & 3.61\% & 8{,}012 km$^2$ \\
+After the DETER non-mining mask & 0.69\% & 1{,}537 km$^2$ \\
+\hline
+\end{tabular}
+\caption{Attrition through the two masks, counted on the intermediate rasters over a systematic sample of one row in ten. The final figure agrees to within 0.2\% with the 1{,}533.9 km$^2$ summed over the vector product.}
+\label{tab:attrition}
+\end{table}
+
+Together the two masks leave 11.2\% of the alert pixels, and that is the intent rather than a side effect. The integrated alerts flag forest disturbance of any kind, and in this region most disturbance is clearing for pasture and fire rather than mining. The price is that mining opened on ground DETER has already labelled under another class is removed along with it, which is a source of omission the pipeline does not correct and which falls hardest where mining follows fire.
+
+We vectorized the masked raster in QGIS, cast it to single-part polygons, reprojected it to SIRGAS 2000 (EPSG:4674) and computed the area of each polygon in the metric projection. The result is 3{,}848{,}782 dated mining polygons summing 1{,}533.9 km$^2$ and covering 2 January 2019 to 6 December 2025.
+
+The minimum mapping unit of Section \ref{sec:mmu} is not part of this layer. It exists to keep nine differently fragmented alert products comparable with one another, and that is a problem the comparison has and the analysis does not. What follows works on detection centroids and on summed area, where fragmentation costs nothing, so every detection down to a single pixel enters the series.
+
+\subsubsection{Extending the series backwards}
+
+The GFW integrated alerts begin in 2019, which is late for this study. Several airstrips in the inventory appear between 2017 and 2018, and a series that starts after them cannot show what happened around them. We filled 2016 to 2018 with DETER mining alerts.
+
+DETER reports the same ground repeatedly across years, so we had to difference the polygons before treating them as new disturbance. For each year $y$ from 2017 onward we differenced the geometry of year $y$ against the union of everything reported up to the end of $y-1$, leaving only the increment. We kept the 2016 polygons whole, since nothing precedes them in this series. Each resulting polygon carries the DETER view date and its own area, and we stack the two sources, DETER up to the start of 2019 and GFW from there on.
+
+The joined series is not homogeneous and we treat it accordingly. DETER has coarser resolution and a different detection logic than the integrated alerts, so the early part is sparser by construction. Its job is to show whether mining was already present around an airstrip before the alert record proper begins, not to be compared in magnitude against the later part.
+
+\subsection{Attributing mining to airstrips}
+
+\subsubsection{Nearest-neighbour assignment}
+
+We reduced every mining polygon to its centroid and projected both centroids and airstrip points to EPSG:31981, so that distances come out in metres. For each mining centroid a $k$-nearest-neighbour search returns the seven nearest airstrips and their distances. Seven is generous for the attribution rules below, but it leaves room to vary the rule without recomputing the search, which is expensive at this volume.
+
+The result is one record per mining detection carrying its date, its area, and seven (airstrip, distance) pairs ordered by distance. We ran the same procedure over the DETER detections of the earlier period.
+
+\subsubsection{Radius of influence}
+
+Attribution needs a cutoff. Beyond some distance a mining polygon has nothing to do with the airstrip that happens to be nearest to it, and counting it only adds noise. To set that distance we plotted the mining around a sample of airstrips as windroses. The angle is the bearing of the detection from the airstrip centre, binned at $15^\circ$; the radius is the distance in 1 km rings; colour carries the mean detection date, the total mined area, or the identity of the nearest airstrip. We drew rivers and neighbouring airstrips on top, so that the structure reads against the terrain.
+
+Fifteen airstrips went into the sample. Four of them we fixed in advance, the ones inside the reference tile. We chose the remaining eleven to span the conditions under which attribution can fail: airstrips in areas of little mining, airstrips in areas of heavy mining, airstrips with several neighbours within a few kilometres, and airstrips covering the range of start, end and inactivity dates the inventory offers.
+
+These plots show where the mining around an airstrip sits, and where it stops organizing itself around that airstrip and starts organizing itself around a river or a neighbour. We read a radius of 6{,}000 m off them and applied it uniformly.
+
+% TODO Levi: falta o crit\'erio objetivo que fixou os 6 km. O que exatamente no
+% windrose marcou essa dist\^ancia? Ver pergunta 9.
+
+\begin{figure}[htbp]
+\centering
+% \includegraphics[width=0.7\textwidth]{figures/windrose_example.png}
+\caption{Windrose of mining detections around one airstrip. Angle is the bearing from the airstrip, radius is distance in 1 km rings out to 6 km, and colour is the mean detection date. Rivers and neighbouring airstrips are overlaid.}
+\label{fig:windrose}
+\end{figure}
+
+\subsubsection{Attribution rules}
+
+Airstrips are not evenly spread. Some stand alone, others cluster within a couple of kilometres of one another, and a mining front sitting between two airstrips can reasonably be attributed to either. We used two rules, and the difference between them is informative in itself. Under $K = 1$ a detection counts for an airstrip only if that airstrip is its nearest, so every detection belongs to exactly one airstrip and the airstrips partition the mining between them. Under $K = 4$ a detection counts for an airstrip whenever that airstrip is among its four nearest, so a single detection can belong to as many as four airstrips and a cluster is treated as jointly serving the mining around it.
+
+In both cases the 6{,}000 m cutoff applies. A detection farther than that from an airstrip is never attributed to it, whatever its rank.
+
+$K = 1$ is the rule we report. It is the one that matches the question, which is what a given airstrip is associated with rather than what its neighbourhood is associated with, and it keeps each detection attached to a single airstrip. $K = 4$ is reported alongside as a robustness check, and its role is to show that the result does not depend on the strictness of the rule.
+
+\subsection{Statistical analysis}
+
+\subsubsection{Monthly series}
+
+For each airstrip and each attribution rule we summed the attributed detections by month into a monthly mined area, and filled the months with no detection with zero, so that every airstrip carries a complete series over the same window, from August 2016 to November 2025. The DETER increments cover the months before January 2019 and the integrated alerts the rest. We plot the cumulative sum of the series per airstrip against the manually assigned dates. The tests use the monthly series itself, not the cumulative one.
+
+\begin{figure}[htbp]
+\centering
+% \includegraphics[width=0.8\textwidth]{figures/cumulative_example.png}
+\caption{Cumulative mined area attributed to one airstrip. Solid vertical lines mark the dates read from the Planet imagery, blue for the appearance of the airstrip and red for its end.}
+\label{fig:cumulative}
+\end{figure}
+
+\subsubsection{Before and after}
+
+The test is paired by construction, since each airstrip is compared against itself. We aligned every series on the month in which the airstrip first appears in the Planet imagery and took two windows around it, the twelve months preceding that month and the month itself together with the twelve that follow. Within each window we computed the mean and the median monthly mined area, which gives one pair of numbers per airstrip. Only the 82 airstrips with an observable start date enter this test; an airstrip already present in the first available image has no month zero to align on.
+
+The anchor is the date read from the imagery and nothing else. We also built an automatic detector of the onset of mining, which searched the monthly series for the first sustained rise in the rate of new detections, and we discarded it. Measured against the dates read from the imagery it disagreed by a median of five and a half months with a standard deviation of nineteen, and it fell within a quarter of the observed date for only 16\% of the airstrips. Beyond being too imprecise to serve as an estimator, anchoring the windows on a detector that is defined by a rise in mining would guarantee the result the test is meant to examine. The manual dating described in Section \ref{sec:index} is expensive, and this is why the study depends on it.
+
+The null hypothesis is that the appearance of an airstrip makes no difference to the mining around it, so that the paired differences are centred on zero. The alternative is one-sided: mining after exceeds mining before. The distribution of per-airstrip means is strongly right-skewed, a sizeable share of the airstrips record no mining at all in the preceding year, and the paired Wilcoxon signed-rank test was therefore used rather than a paired $t$-test. We report the test on the median monthly area, with the mean as a secondary check, and the Hodges-Lehmann estimator to express the shift in hectares per month.
+
+Two limits of the design should be read alongside the result. The first is that airstrips within a few kilometres of one another share detections under $K = 4$ and compete for them under $K = 1$, so the 82 pairs are not fully independent and the test is anticonservative to a degree we do not quantify here. The second is that the comparison establishes a change of regime coinciding with the appearance of an airstrip, not a mechanism. An airstrip and a mining front can both follow from a third decision taken upstream, and nothing in this design separates the two.
+
+The airstrips also carry an end date and an inactivity date, which would allow the symmetric test at the other end of their operating life. We do not run it here. Fewer airstrips carry a usable end than a usable start, and the test additionally requires enough of the series to remain after that date, which leaves a sample too small to carry an independent claim.
+
+\subsubsection{Control group}
+
+A before-and-after comparison on its own cannot separate the effect of the airstrip from the regional trend. Mining expanded across the whole study area over the observation window, and an airstrip opened in the middle of that expansion will show more mining after than before whether or not it caused anything.
+
+The counterfactual is mining that is far from every airstrip. We took the mining detections of three sources over the study area, DETER mining alerts, MapBiomas Alerta features classed as mining or illegal mining, and the processed GFW layer, buffered every airstrip in the inventory by 6{,}000 m and subtracted the union of those buffers. What remains is mining that no airstrip in the inventory can be credited with under the rules above.
+
+Aggregated monthly, this control series gives the background rate at which mining expanded in the study area, and we read the change around airstrips against it rather than against zero.
+
+% TODO Levi: dois pontos sobre o grupo de controle.
+% (1) Corre\c{c}\~ao de uma linha: grupo\_controle.R linha 101 l\^e
+%     mask\_only\_miner\_gfw.gpkg, que \'e a m\'ascara do ramo ALB\_DETL abandonado e
+%     n\~ao tem coluna doy, por isso as 52.524 fei\c{c}\~oes fonte="gfw" do
+%     final\_controle.gpkg est\~ao com data nula e n\~ao entram na s\'erie mensal.
+%     Trocar para 6\_gfw/GFW\_final\_area.gpkg, que \'e a mesma linhagem do grupo de
+%     tratamento. Talvez valha fazer o st\_difference nos centroides.
+% (2) Falta definir a estat\'istica que compara pistas contra controle. Hoje o
+%     analise\_grupo\_controle.R s\'o produz o gr\'afico agregado.
+
+\subsection{Implementation}
+
+We built the pipeline in R. Vector operations use \texttt{sf}, raster operations use \texttt{terra}, and the nearest-neighbour search uses \texttt{dbscan}. Two coordinate reference systems run throughout. SIRGAS 2000 geographic (EPSG:4674) holds the data for storage, exchange and display, and SIRGAS 2000 / UTM 21S (EPSG:31981) carries every metric computation, since it covers the study area without straddling a zone boundary. Half-year periods are encoded as year plus $(\text{semester}-1)/2$, so the second half of 2023 is 2023.5.
+
+\begin{figure}[htbp]
+\centering
+% \includegraphics[width=0.95\textwidth]{figures/workflow.png}
+\caption{Processing chain, from the raw airstrip sources and the alert rasters through the two masks, the vectorization and the nearest-neighbour assignment, to the monthly series and the paired comparison.}
+\label{fig:workflow}
+\end{figure}
+
+\section{Results}
+
+% TODO Levi: a escrever depois de rodar o resultados_novo.R.
+
+\section{Discussion}
+
+% TODO Levi: a escrever.
+
+\section{Conclusion}
+
+% TODO Levi: a escrever.
+
+\section*{Data and code availability}
+
+% TODO Levi: decidir o que abrir. O reposit\'orio \'e privado hoje. Op\c{c}\~oes:
+% abrir o c\'odigo e a base de pistas (leve) e apontar os rasters para as fontes
+% originais, ou publicar a base de pistas datada como dataset com DOI, que \'e o
+% ativo mais original do trabalho.
+
+\begin{thebibliography}{99}
+
+\bibitem[Assis et al.(2019)]{assis2019}
+Assis, L. F. F. G., Ferreira, K. R., Vinhas, L., Maurano, L., Almeida, C., Carvalho, A., Rodrigues, J., Maciel, A., Camargo, C. (2019).
+TerraBrasilis: A Spatial Data Analytics Infrastructure for Large-Scale Thematic Mapping.
+\textit{ISPRS International Journal of Geo-Information}, 8(11), 513.
+
+\bibitem[Ball\`ere et al.(2021)]{ballere2021}
+Ball\`ere, M., Bouvet, A., Mermoz, S., Le Toan, T., Koleck, T., Bedeau, C., Andr\'e, M., Forestier, E., Frison, P.-L., Lardeux, C. (2021).
+SAR data for tropical forest disturbance alerts in French Guiana: Benefit over optical imagery.
+\textit{Remote Sensing of Environment}, 252, 112159.
+
+\bibitem[Basta et al.(2021)]{basta2021}
+Basta, P. C., Viana, P. V. S., Vasconcellos, A. C. S., P\'eriss\'e, A. R. S., Hofer, C. B., Paiva, N. S. et al. (2021).
+Mercury Exposure in Munduruku Indigenous Communities from Brazilian Amazon: Methodological Background and an Overview of the Principal Results.
+\textit{International Journal of Environmental Research and Public Health}, 18(17), 9222.
+
+\bibitem[Bouvet et al.(2018)]{bouvet2018}
+Bouvet, A., Mermoz, S., Ball\`ere, M., Koleck, T., Le Toan, T. (2018).
+Use of the SAR Shadowing Effect for Deforestation Detection with Sentinel-1 Time Series.
+\textit{Remote Sensing}, 10(8), 1250.
+
+\bibitem[Brasil(1988)]{brasil1988}
+Brasil (1988).
+\textit{Constitui\c{c}\~ao da Rep\'ublica Federativa do Brasil de 1988}, art. 231, \S3 and \S7.
+Bras\'ilia: Presid\^encia da Rep\'ublica.
+
+\bibitem[Diniz et al.(2015)]{diniz2015}
+Diniz, C. G., Souza, A. A. A., Santos, D. C., Dias, M. C., Luz, N. C., Moraes, D. R. V., Maia, J. S., Gomes, A. R., Narvaes, I. S., Valeriano, D. M., Maurano, L. E. P., Adami, M. (2015).
+DETER-B: The New Amazon Near Real-Time Deforestation Detection System.
+\textit{IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing}, 8(7), 3619--3628.
+
+\bibitem[Doblas et al.(2024)]{doblas2024}
+Doblas, J., Reis, M. S., Mermoz, S., Almeida, C. A., Koleck, T., Messias, C. G., Soler, L., Bouvet, A., Sant'Anna, S. J. S. (2024).
+DETER-R: The new INPE-TropiSCO deforestation monitoring system in the Amazon biome.
+\textit{The International Archives of the Photogrammetry, Remote Sensing and Spatial Information Sciences}, XLVIII-3-2024, 127--133.
+
+\bibitem[Ferreira Neto et al.(2024)]{ferreiraneto2024}
+Cortinhas Ferreira Neto, L., Diniz, C. G., Maretto, R. V., Persello, C., Silva Pinheiro, M. L., Castro, M. C., Sadeck, L. W. R., Fernandes Filho, A., Cansado, J., Souza, A. A. A., Feitosa, J. P., Santos, D. C., Adami, M., Souza-Filho, P. W. M., Stein, A., Biehl, A., Klautau, A. (2024).
+Uncontrolled Illegal Mining and Garimpo in the Brazilian Amazon.
+\textit{Nature Communications}, 15, 9847.
+
+\bibitem[Furtado et al.(2024)]{furtado2024}
+Furtado, E. B., Franchi, T., Rodrigues, L. B., Sim\~oes, G. F. (2024).
+Asas que devastam a Amaz\^onia: uma an\'alise do cen\'ario de pistas de pouso e voos irregulares que d\~ao suporte ao garimpo ilegal na TI Yanomami.
+\textit{Revista (Re)Defini\c{c}\~oes das Fronteiras}, 2(6), 16--51.
+
+\bibitem[Gomes et al.(2023)]{gomes2023}
+Gomes, L. S., Shiguemori, E. H., Kuck, T. N., Alves, D. I. (2023).
+Detec\c{c}\~ao Autom\'atica de Pistas N\~ao Homologadas em Imagens SAR na Regi\~ao da Amaz\^onia.
+In \textit{Anais do XXV Simp\'osio de Aplica\c{c}\~oes Operacionais em \'Areas de Defesa (SIGE)}, S\~ao Jos\'e dos Campos.
+
+\bibitem[Gomes et al.(2026)]{gomes2026}
+Gomes, L. S., Stabile, G. H. Q., Kuck, T. N., Figueiredo, F. A. P., Shiguemori, E. H., Alves, D. I. (2026).
+A Sentinel-1 SAR imagery dataset for airstrips detection and segmentation in the Brazilian Amazon Rainforest.
+\textit{Data in Brief}, 65, 112472.
+
+\bibitem[Hansen et al.(2016)]{hansen2016}
+Hansen, M. C., Krylov, A., Tyukavina, A., Potapov, P. V., Turubanova, S., Zutta, B., Ifo, S., Margono, B., Stolle, F., Moore, R. (2016).
+Humid tropical forest disturbance alerts using Landsat data.
+\textit{Environmental Research Letters}, 11(3), 034008.
+
+\bibitem[Imazon()]{imazonsad}
+Imazon.
+\textit{Sistema de Alerta de Desmatamento (SAD)}.
+% TODO Levi: escolher a refer\^encia canônica do SAD (relat\'orio ou p\'agina) e completar.
+
+\bibitem[The Intercept Brasil(2022)]{intercept2022}
+The Intercept Brasil (2022).
+Amaz\^onia tem 362 pistas de pouso clandestinas perto de \'areas devastadas pelo garimpo.
+Investigation with Earthrise Media, the Pulitzer Center and The New York Times, 2 August 2022.
+% TODO Levi: falta o nome do(a) autor(a) da mat\'eria.
+
+\bibitem[MapBiomas(2022)]{mapbiomas2022mineracao}
+MapBiomas (2022).
+\textit{Destaques do Mapeamento Anual de Minera\c{c}\~ao e Garimpo no Brasil de 1985 a 2021}.
+Cole\c{c}\~ao 7 da S\'erie Anual de Mapas de Cobertura e Uso da Terra do Brasil. S\~ao Paulo.
+
+\bibitem[MapBiomas(2023a)]{mapbiomas2023mineracao}
+MapBiomas (2023).
+\textit{Destaques do Mapeamento Anual de Minera\c{c}\~ao no Brasil, 1985 a 2022: o avan\c{c}o garimpeiro na Amaz\^onia}.
+Cole\c{c}\~ao 8 da S\'erie Anual de Mapas de Cobertura e Uso da Terra do Brasil. S\~ao Paulo.
+
+\bibitem[MapBiomas(2023b)]{mapbiomas2023pistas}
+MapBiomas (2023).
+\textit{Mapeamento das pistas de pouso e garimpo na Amaz\^onia}. S\~ao Paulo.
+
+\bibitem[MapBiomas Alerta()]{mapbiomasalerta}
+MapBiomas Alerta.
+\textit{Sistema de Valida\c{c}\~ao e Refinamento de Alertas de Desmatamento com Imagens de Alta Resolu\c{c}\~ao}.
+Available at https://alerta.mapbiomas.org
+
+\bibitem[Mataveli et al.(2022)]{mataveli2022}
+Mataveli, G., Chaves, M., Guerrero, J., Escobar-Silva, E. V., Concei\c{c}\~ao, K., de Oliveira, G. (2022).
+Mining Is a Growing Threat within Indigenous Lands of the Brazilian Amazon.
+\textit{Remote Sensing}, 14(16), 4092.
+
+\bibitem[Meneses et al.(2022)]{meneses2022}
+Meneses, H. N. M., Oliveira-da-Costa, M., Basta, P. C., Morais, C. G., Pereira, R. J. B., Souza, S. M. S., Hacon, S. S. (2022).
+Mercury Contamination: A Growing Threat to Riverine and Urban Communities in the Brazilian Amazon.
+\textit{International Journal of Environmental Research and Public Health}, 19(5), 2816.
+
+\bibitem[Mermoz et al.(2021)]{mermoz2021}
+Mermoz, S., Bouvet, A., Koleck, T., Ball\`ere, M., Le Toan, T. (2021).
+Continuous Detection of Forest Loss in Vietnam, Laos, and Cambodia Using Sentinel-1 Data.
+\textit{Remote Sensing}, 13(23), 4877.
+
+\bibitem[Pardini et al.(2024)]{pardini2024}
+Pardini, G. R., Kuck, T. N., Shiguemori, E. H., M\'aximo, M. R. O. A., Dietzsch, G., Molina, P. (2024).
+Multistage Algorithm for Detecting Landing Strips in the Amazon Rainforest.
+\textit{IEEE Geoscience and Remote Sensing Letters}, 21, 1--5.
+
+\bibitem[Pardini et al.(2025)]{pardini2025}
+Pardini, G. R., Tasinaffo, P. M., Shiguemori, E. H., Kuck, T. N., M\'aximo, M. R. O. A., Gyotoku, W. R. (2025).
+Improved Algorithm to Detect Clandestine Airstrips in Amazon RainForest.
+\textit{Algorithms}, 18(2), 102.
+
+\bibitem[Reiche et al.(2021)]{reiche2021}
+Reiche, J., Mullissa, A., Slagter, B., Gou, Y., Tsendbazar, N.-E., Odongo-Braun, C., Vollrath, A., Weisse, M. J., Stolle, F., Pickens, A., Donchyts, G., Clinton, N., Gorelick, N., Herold, M. (2021).
+Forest disturbance alerts for the Congo Basin using Sentinel-1.
+\textit{Environmental Research Letters}, 16(2), 024005.
+
+\bibitem[Reiche et al.(2024)]{reiche2024}
+Reiche, J., Balling, J., Pickens, A. H., Masolele, R. N., Berger, A., Weisse, M. J., Mannarino, D., Gou, Y., Slagter, B., Donchyts, G., Carter, S. (2024).
+Integrating satellite-based forest disturbance alerts improves detection timeliness and confidence.
+\textit{Environmental Research Letters}, 19(5), 054011.
+
+\bibitem[Rodrigues and Giovanelli(2024)]{escolhas2024}
+Rodrigues, L., Giovanelli, R. (2024).
+\textit{Where Does So Much Mercury Come From?}
+S\~ao Paulo: Instituto Escolhas.
+
+\bibitem[Silva et al.(2023)]{silva2023}
+da Silva, C. F. A., de Andrade, M. O., dos Santos, A. M., Falc\~ao, V. A., Martins, S. F. S. (2023).
+The drivers of illegal mining on Indigenous Lands in the Brazilian Amazon.
+\textit{The Extractive Industries and Society}, 16, 101354.
+
+\bibitem[Slagter et al.(2023)]{slagter2023}
+Slagter, B., Reiche, J., Marcos, D., Mullissa, A., Lossou, E., Pe\~na-Claros, M., Herold, M. (2023).
+Monitoring direct drivers of small-scale tropical forest disturbance in near real-time with Sentinel-1 and -2 data.
+\textit{Remote Sensing of Environment}, 295, 113655.
+
+\bibitem[Slagter et al.(2026)]{slagter2026}
+Slagter, B., Cue La Rosa, L., Berger, A., Carter, S., Herold, M., Pe\~na-Claros, M., Reiche, J. (2026).
+Rapid satellite monitoring reveals complexity of tropical tree cover loss drivers at fine scale.
+Preprint, Research Square.
+% TODO Levi: ainda \'e preprint (mar\c{c}o de 2026, em revis\~ao). Verificar antes de submeter.
+
+\bibitem[Souza et al.(2020)]{souza2020}
+Souza Jr., C. M., Shimbo, J. Z., Rosa, M. R. et al. (2020).
+Reconstructing Three Decades of Land Use and Land Cover Changes in Brazilian Biomes with Landsat Archive and Earth Engine.
+\textit{Remote Sensing}, 12(17), 2735.
+
+\bibitem[Valeriano et al.(2004)]{valeriano2004}
+Valeriano, D. M., Mello, E. M. K., Moreira, J. C., Shimabukuro, Y. E., Duarte, V., Souza, I. M., Santos, J. R., Barbosa, C. C. F., Souza, R. C. M. (2004).
+Monitoring Tropical Forest from Space: The PRODES Digital Project.
+In \textit{The International Archives of the Photogrammetry, Remote Sensing and Spatial Information Sciences}, XXXV(B7), Istanbul.
+
+\bibitem[Vega et al.(2018)]{vega2018}
+Vega, C. M., Orellana, J. D. Y., Oliveira, M. W., Hacon, S. S., Basta, P. C. (2018).
+Human Mercury Exposure in Yanomami Indigenous Villages from the Brazilian Amazon.
+\textit{International Journal of Environmental Research and Public Health}, 15(6), 1051.
+
+\bibitem[World Gold Council(2026)]{wgc2026}
+World Gold Council (2026).
+\textit{Gold Demand Trends: Q4 and Full Year 2025}. London.
+
+\end{thebibliography}
+
+\end{document}
