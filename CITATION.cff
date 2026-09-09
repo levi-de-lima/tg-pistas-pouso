@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: "Se você usar este código ou esta base de dados, por favor cite conforme abaixo."
+
+title: "Pistas de pouso e mineração artesanal na Amazônia Legal Brasileira: pipeline de análise e base de pistas indexada temporalmente"
+
+abstract: >-
+  Pipeline em R e base de dados de um estudo sobre a relação espaço-temporal
+  entre o surgimento de pistas de pouso e a atividade de mineração artesanal
+  (garimpo) na Amazônia Legal Brasileira. Inclui um inventário de 379 pistas
+  consolidado a partir de seis fontes e datado individualmente por inspeção
+  visual do acervo Planet, a comparação de nove sistemas de alerta de distúrbio
+  florestal contra delineamento manual, e a série mensal de área minerada no
+  entorno de cada pista construída a partir dos alertas integrados do Global
+  Forest Watch.
+
+type: software
+version: 1.0.0
+date-released: 2026-09-09
+license: MIT
+repository-code: "https://github.com/levi-de-lima/tg-pistas-pouso"
+
+authors:
+  - family-names: "de Lima"
+    given-names: "Levi"
+    # PREENCHER antes de publicar a release:
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+    # affiliation: "Nome da instituição"
+
+keywords:
+  - garimpo
+  - artisanal and small-scale mining
+  - clandestine airstrips
+  - forest disturbance alerts
+  - Brazilian Legal Amazon
+  - Tapajós
+  - remote sensing
+  - Planet
+  - Global Forest Watch
+  - DETER
