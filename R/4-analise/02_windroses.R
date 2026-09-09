@@ -18,13 +18,13 @@ library(RColorBrewer)
 # 1. Obter um arquivo gpkg do GFW retirados os polígonos que não são de mineração
 # 2. Escolher 10 pistas representativas para essa análise (separar 10 ids)
 
-area_estudo <- read_sf("1_fontes/area_estudo/area_de_estudo.gpkg")
+area_estudo <- read_sf("dados/mestres/area_estudo/area_de_estudo.gpkg")
 
-Deter_cropped <- read_sf("1_fontes/deter/Deter_cropped.gpkg")
+Deter_cropped <- read_sf("dados/brutos/deter/Deter_cropped.gpkg")
 
 Deter_non_miner <- Deter_cropped %>% filter(CLASSNAME != "MINERACAO")
 
-GFW <- read_sf("6_gfw/GFW_binded.gpkg")
+GFW <- read_sf("dados/derivados/gfw/GFW_binded.gpkg")
 
 GFW_filtered <- st_filter(GFW, Deter_non_miner, .predicate = st_disjoint)
 
@@ -39,7 +39,7 @@ GFW_filtered <- st_filter(GFW, Deter_non_miner, .predicate = st_disjoint)
 
 ids <- c(11, 12, 13, 25, 176, 196, 192, 2350, 2406, 2407, 2432, 2463, 2546, 2550, 72262)
 
-GFW_raw <- read_sf("6_gfw/GFW_final.gpkg") 
+GFW_raw <- read_sf("dados/derivados/gfw/GFW_final.gpkg") 
 GFW <- GFW_raw %>% 
   # mutate(semestre = ifelse(month(DATE) <= 6, 1, 2), ano_sem = as.double(YEAR) + (semestre - 1)/2) %>% 
   st_transform(31981) %>% 
@@ -59,14 +59,14 @@ GFW <- GFW_raw %>%
 #   Como calcular a direção da pista? -> PCA
 #   Quando calculado adionar uma coluna com essa direção no dotted
 
-GFW_raw <- read_sf("6_gfw/GFW_dist.gpkg")
-Deter_before <- read_sf("7_alertas_before/deter_dist.gpkg") %>% dplyr::filter(doy < "2019-01-02")
-base_pistas <- read_sf("5_base_final/base_pistas_final.gpkg", layer="pontos")
+GFW_raw <- read_sf("dados/derivados/gfw/GFW_dist.gpkg")
+Deter_before <- read_sf("dados/derivados/deter_retroativo/deter_dist.gpkg") %>% dplyr::filter(doy < "2019-01-02")
+base_pistas <- read_sf("dados/mestres/base_pistas_final.gpkg", layer="pontos")
 
 GFW <- bind_rows(GFW_raw, Deter_before)
 
-pistas_polig <- read_sf("5_base_final/base_pistas_final.gpkg", layer="poligonos")
-pistas_ponto <- read_sf("5_base_final/base_pistas_final.gpkg", layer="pontos")
+pistas_polig <- read_sf("dados/mestres/base_pistas_final.gpkg", layer="poligonos")
+pistas_ponto <- read_sf("dados/mestres/base_pistas_final.gpkg", layer="pontos")
 
 calc_orientacao <- function(geom) {
   # extrai coordenadas
@@ -112,7 +112,7 @@ moda <- function(x) {
   factor(names(tab)[which.max(tab)], levels = levels(x))
 }
 
-rios <- read_sf("5_base_final/curso_dagua.gpkg") %>% st_transform(4674)
+rios <- read_sf("dados/derivados/base_final/curso_dagua.gpkg") %>% st_transform(4674)
 
 for (i in pistas_ponto$id_pista[144:length(pistas_ponto$id_pista)]) {
   cat("\n============================\n")
@@ -300,7 +300,7 @@ for (i in pistas_ponto$id_pista[144:length(pistas_ponto$id_pista)]) {
                            pad_x = unit(1,"cm"), pad_y = unit(1,"cm"))
   
   cat("→ Salvando imagens\n")
-  ggsave(paste0("6_gfw/all_wind_2/pista_", id, "_data.png"), p1+camada_pistas+camada_rios, width = 8, height = 6, dpi = 300, bg = "transparent")
+  ggsave(paste0("resultados/figuras/windroses/pista_", id, "_data.png"), p1+camada_pistas+camada_rios, width = 8, height = 6, dpi = 300, bg = "transparent")
   
   cat("→ Exibindo plots\n")
   print(p1+camada_rios+camada_pistas)

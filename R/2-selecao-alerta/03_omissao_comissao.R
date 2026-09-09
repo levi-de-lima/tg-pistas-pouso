@@ -3,7 +3,7 @@ library(spatialEco)
 library(tidyverse)
 library(ggplot2)
 
-df <- read_sf("4_analise_comparativa/df_track.gpkg") %>%
+df <- read_sf("resultados/tabelas/df_track.gpkg") %>%
   st_drop_geometry() %>% 
   # filter(nome == "GWF") %>% 
   pivot_wider(names_from = track, values_from = area) %>% 

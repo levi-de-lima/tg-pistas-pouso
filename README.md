@@ -31,17 +31,25 @@ R/                     pipeline, em quatro etapas numeradas
   3-serie-mineracao/   processamento do GFW, DETER retroativo
   4-analise/           kNN, windroses, teste antes/depois, grupo de controle
 
-2_base_pistas/         base consolidada de pistas (versionada)
-9_resultados/          figuras e tabelas de resultado (versionadas)
+dados/
+  brutos/              fontes públicas, ignoradas pelo git
+  mestres/             pequeno e insubstituível, versionado
+  derivados/           o que o pipeline refaz, ignorado pelo git
+resultados/
+  tabelas/             versionadas
+  figuras/             agregadas versionadas; as por pista, ignoradas
 artigo/                manuscrito em LaTeX
 _arquivo/              ramos abandonados, fora do controle de versão
 TIMELINE.md            cronologia do projeto em sete fases
 REORGANIZACAO.md       diagnóstico do repositório e plano de migração
 ```
 
-As fontes públicas e as saídas intermediárias do pipeline **não estão
-versionadas**: somam mais de 20 GB e são, respectivamente, baixáveis e
-regeneráveis. Ver a seção Fontes de dados.
+Os dados são organizados por durabilidade, não por etapa. O que sai de um
+download vive em `dados/brutos/`; o que sai de um script rodando vive em
+`dados/derivados/`; o que saiu de inspeção visual e não dá para refazer vive em
+`dados/mestres/` e é o único bloco de dados versionado. Brutos e derivados
+somam 19 GB e ficam fora do git, respectivamente porque são baixáveis e porque
+são regeneráveis. Ver a seção Fontes de dados.
 
 ## O pipeline, etapa por etapa
 
@@ -56,7 +64,7 @@ RStudio, que define o diretório de trabalho corretamente.
 | `02_cruza_anac.R` | intersecta com o cadastro da ANAC (buffer de 550 m) e marca a situação de registro |
 | `03_base_final.R` | junta a planilha mestra de datas, calcula ano-semestre, gera um screenshot por pista e escreve a base final |
 
-Produto: `5_base_final/base_pistas_final.gpkg`, camadas `pontos` e `poligonos`.
+Produto: `dados/mestres/base_pistas_final.gpkg`, camadas `pontos` e `poligonos`.
 379 pistas, 54 registradas na ANAC e 325 não, 82 com data de início observável.
 
 ### Etapa 2 — Seleção do sistema de alerta

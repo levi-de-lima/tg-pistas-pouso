@@ -1,12 +1,12 @@
 library(dbscan)
 library(sf)
 
-GFW_raw <- read_sf("Mining_Masked_GFWclass.gpkg")
+GFW_raw <- read_sf("_arquivo/ramo-alb-detl/Mining_Masked_GFWclass.gpkg")
 
 GFW_centroids <- GFW_raw %>% mutate(geom = st_centroid())
 
-pistas_ponto <- read_sf("5_base_final/base_pistas_final.gpkg")
-GFW_c <- read_sf("6_gfw/GFW_centroide.gpkg")
+pistas_ponto <- read_sf("dados/mestres/base_pistas_final.gpkg")
+GFW_c <- read_sf("dados/derivados/gfw/GFW_centroide.gpkg")
 
 coords_gfw_mat    <- st_coordinates(GFW_c %>% st_transform(31981))
 coords_pistas_mat <- st_coordinates(pistas_ponto %>% st_transform(31981))
@@ -24,7 +24,7 @@ for (k in 1:7) {
   GFW_c[[paste0("dist_",  k)]] <- knn_result$dist[, k]
 }
 
-write_sf(GFW_c, "6_gfw/GFW_dist.gpkg")
+write_sf(GFW_c, "dados/derivados/gfw/GFW_dist.gpkg")
 
 
 # Matriz de distâncias entre todas as pistas

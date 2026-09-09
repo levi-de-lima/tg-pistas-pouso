@@ -381,10 +381,14 @@ We built the pipeline in R. Vector operations use \texttt{sf}, raster operations
 
 \section*{Data and code availability}
 
-% TODO Levi: decidir o que abrir. O reposit\'orio \'e privado hoje. Op\c{c}\~oes:
-% abrir o c\'odigo e a base de pistas (leve) e apontar os rasters para as fontes
-% originais, ou publicar a base de pistas datada como dataset com DOI, que \'e o
-% ativo mais original do trabalho.
+The full processing chain is available at \texttt{github.com/levi-de-lima/tg-pistas-pouso} and archived at \citet{delima2026code}. The archive covers the four stages described in Section 2: the consolidation and temporal indexing of the airstrip inventory, the benchmark of the nine alert systems, the construction of the mining series, and the attribution and statistical analysis.
+
+None of the public source datasets are redistributed here. DETER, PRODES, MapBiomas Alerta, the GFW integrated alerts, S1-AAD, the ANAC aerodrome registry, OpenStreetMap and IBGE are all obtained from their original providers, cited in Section 2, and the repository documents which product and which download each stage consumes. The Planet imagery used for the temporal indexing was accessed through the Programa Brasil MAIS platform of the Brazilian Federal Police and is subject to that programme's terms of use, so it is neither redistributed nor archived.
+
+% TODO Levi: o registro de dados (base de pistas datada + delineamento manual do
+% Planet + df_track) fica pendente da conversa com os orientadores sobre publicar
+% coordenadas datadas de pistas nao registradas. Quando decidir, entra aqui com
+% DOI proprio e uma frase dizendo o que esta aberto e o que sai sob solicitacao.
 
 \begin{thebibliography}{99}
 
@@ -412,6 +416,11 @@ Use of the SAR Shadowing Effect for Deforestation Detection with Sentinel-1 Time
 Brasil (1988).
 \textit{Constitui\c{c}\~ao da Rep\'ublica Federativa do Brasil de 1988}, art. 231, \S3 and \S7.
 Bras\'ilia: Presid\^encia da Rep\'ublica.
+
+\bibitem[de Lima(2026)]{delima2026code}
+de Lima, L. (2026).
+\textit{Pistas de pouso e minera\c{c}\~ao artesanal na Amaz\^onia Legal Brasileira: pipeline de an\'alise e base de pistas indexada temporalmente}. Zenodo.
+DOI: 10.5281/zenodo.22679181
 
 \bibitem[Diniz et al.(2015)]{diniz2015}
 Diniz, C. G., Souza, A. A. A., Santos, D. C., Dias, M. C., Luz, N. C., Moraes, D. R. V., Maia, J. S., Gomes, A. R., Narvaes, I. S., Valeriano, D. M., Maurano, L. E. P., Adami, M. (2015).

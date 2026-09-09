@@ -6,13 +6,13 @@ library(terra)
 library(sf)
 library(tidyverse)
 
-area_estudo <- read_sf("1_fontes/area_estudo/area_de_estudo.gpkg")
-GWF_raw <- rast("1_fontes/gwf/GWF_ALB.tiff")
+area_estudo <- read_sf("dados/mestres/area_estudo/area_de_estudo.gpkg")
+GWF_raw <- rast("dados/brutos/gwf/GWF_ALB.tiff")
 GWF_raw <- GWF_raw %>% crop(area_estudo %>% st_transform(st_crs(GWF_raw)))
 
 GWF_clamp <- clamp(GWF_raw, lower=30000, upper=45000, values=FALSE)
 
-writeRaster(GWF_clamp, "6_gwf/GFW_area_de_estudo.tiff", overwrite=TRUE)
+writeRaster(GWF_clamp, "dados/derivados/gfw/GFW_area_de_estudo.tiff", overwrite=TRUE)
 
 # gera todos os dias possíveis
 origem <- as.Date("2015-01-01")
@@ -60,7 +60,7 @@ for (sem in semestres) {
     mutate(ano_sem = sem / 10)
   
   # salva direto em arquivo
-  write_sf(vet_sem, "6_gwf/GWF_vetorizado_2.gpkg",
+  write_sf(vet_sem, "dados/derivados/gfw/GWF_vetorizado_2.gpkg",
            layer = paste0("sem_", sem),
            append = TRUE)
   
@@ -74,7 +74,7 @@ GFW_area_estudo <- list()
 for (i in 1:14) {
   cat("---------------------\n")
   cat("Processando semestre: ", semestres[i], "\n")
-  GFW_vetor <- read_sf("6_gwf/GWF_vetorizado_2.gpkg", layer = paste0("sem_",semestres[i])) %>% st_transform(4674)
+  GFW_vetor <- read_sf("dados/derivados/gfw/GWF_vetorizado_2.gpkg", layer = paste0("sem_",semestres[i])) %>% st_transform(4674)
   cat("Vetor lido\n")
   
   GFW_area_estudo[[i]] <- GFW_vetor
@@ -84,7 +84,7 @@ for (i in 1:14) {
 
 GFW_binded <- bind_rows(GFW_area_estudo)
 
-write_sf(GFW_binded, "6_gwf/GFW_binded.gpkg")
+write_sf(GFW_binded, "dados/derivados/gfw/GFW_binded.gpkg")
 
 GFW_mmu <- GFW_binded %>% 
   st_transform(31981) %>% 
@@ -162,4 +162,4 @@ ggplot(sf_plot, aes(x = ano_sem, y = area)) +
   ) +
   facet_wrap(~ pista_proxima, ncol = 4, scales = "free_y")
 
-write_sf(sf_plot, "data/processed/GFW_pistas_plot.gpkg")
+write_sf(sf_plot, "dados/derivados/GFW_pistas_plot.gpkg")

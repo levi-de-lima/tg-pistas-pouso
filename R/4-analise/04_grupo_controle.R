@@ -10,8 +10,8 @@ library(dbscan)
 ###############################
 
 # 1. Carregamento e Preparação dos Dados Raster
-area_estudo <- read_sf("1_fontes/area_estudo/area_de_estudo.gpkg") %>% st_make_valid()
-Deter_raw <- read_sf("1_fontes/deter/deter_orignal/deter_orig.gpkg") 
+area_estudo <- read_sf("dados/mestres/area_estudo/area_de_estudo.gpkg") %>% st_make_valid()
+Deter_raw <- read_sf("dados/brutos/deter/deter_orignal/deter_orig.gpkg") 
 sf::sf_use_s2(FALSE)
 Deter_cropped <- Deter_raw %>% st_intersection(area_estudo) %>% filter(CLASSNAME == "MINERACAO")
 sf::sf_use_s2(TRUE)
@@ -66,13 +66,13 @@ deter_area <- deter_final %>%
   filter(!st_is_empty(geom))
 sf_use_s2(TRUE)
 
-write_sf(deter_area %>% select(doy, area, geom), "5_base_final/grupo_controle/deter_controle.gpkg")
+write_sf(deter_area %>% select(doy, area, geom), "dados/derivados/base_final/grupo_controle/deter_controle.gpkg")
 
 ###############################
 # MapBiomas      ##############
 ###############################
 
-MapBiomas_raw <- read_sf("1_fontes/mapbiomas/MapBiomas_ALB.gpkg")
+MapBiomas_raw <- read_sf("dados/brutos/mapbiomas/MapBiomas_ALB.gpkg")
 sf::sf_use_s2(FALSE)
 MB_cropped <- MapBiomas_raw %>% st_transform(4674) %>% 
   st_intersection(area_estudo) %>% filter(VPRESSAO == "mining" | VPRESSAO == "ilegal_mining")
@@ -92,13 +92,13 @@ mapbiomas_area <- MapBiomas %>%
   filter(!st_is_empty(geom))
 sf_use_s2(TRUE)
 
-write_sf(mapbiomas_area %>% select(doy, area, geom), "5_base_final/grupo_controle/mapbiomas_controle.gpkg")
+write_sf(mapbiomas_area %>% select(doy, area, geom), "dados/derivados/base_final/grupo_controle/mapbiomas_controle.gpkg")
 
 ###############################
 # GFW & final      ############
 ###############################
 
-gfw <- read_sf("mask_only_miner_gfw.gpkg")
+gfw <- read_sf("_arquivo/ramo-alb-detl/mask_only_miner_gfw.gpkg")
 
 sf_use_s2(FALSE)
 gfw_area <- gfw %>% 
@@ -109,7 +109,7 @@ gfw_area <- gfw %>%
   filter(!st_is_empty(geom))
 sf_use_s2(TRUE)
 
-write_sf(gfw_area, "5_base_final/grupo_controle/gfw_controle.gpkg")
+write_sf(gfw_area, "dados/derivados/base_final/grupo_controle/gfw_controle.gpkg")
 
 final <- bind_rows(
   gfw = gfw_area,
@@ -118,21 +118,21 @@ final <- bind_rows(
   .id = "fonte"
 )
 
-write_sf(final, "5_base_final/grupo_controle/final_controle.gpkg")
+write_sf(final, "dados/derivados/base_final/grupo_controle/final_controle.gpkg")
 
-final_controle <- read_sf("5_base_final/grupo_controle/final_controle.gpkg")
+final_controle <- read_sf("dados/derivados/base_final/grupo_controle/final_controle.gpkg")
 
-base_pistas  <- read_sf("5_base_final/base_pistas_final.gpkg", layer = "pontos")
+base_pistas  <- read_sf("dados/mestres/base_pistas_final.gpkg", layer = "pontos")
 
 pistas_buffer <- base_pistas %>% 
   st_transform(31981) %>% 
   st_buffer(6000) %>% 
   st_transform(4674)
 
-write_sf(pistas_buffer, "5_base_final/grupo_controle/pistas_buffer.gpkg")
+write_sf(pistas_buffer, "dados/derivados/base_final/grupo_controle/pistas_buffer.gpkg")
 
 sf_use_s2(FALSE)
 controle_non_buffer <- st_difference(final_controle, pistas_buffer)
 sf_use_s2(TRUE)
 
-write_sf(controle_non_buffer, "5_base_final/grupo_controle/non_buffer_controle.gpkg")
+write_sf(controle_non_buffer, "dados/derivados/base_final/grupo_controle/controle_non_buffer.gpkg")

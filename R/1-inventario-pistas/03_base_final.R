@@ -7,12 +7,12 @@ library(sf)
 library(tidyverse)
 library(webshot2)
 
-pistas_xlsx <- read.xlsx("2_base_pistas/pistas.xlsx")
-pistas_gpkg <- read_sf("2_base_pistas/base_pistas_atualizada.gpkg") %>% select(2,3,9,18)
+pistas_xlsx <- read.xlsx("dados/mestres/base_pistas/pistas.xlsx")
+pistas_gpkg <- read_sf("dados/mestres/base_pistas/base_pistas_atualizada.gpkg") %>% select(2,3,9,18)
 
-pistas_shp <- read_sf("3_planet_orders/pistas_geometria/aois_417.shp")
-ibge_shp <- read_sf("3_planet_orders/adicionais/aois_7.shp")
-anac_shp <- read_sf("3_planet_orders/aois_4-08-04-2026-1510/aois_4.shp")
+pistas_shp <- read_sf("dados/mestres/planet/pistas_geometria/aois_417.shp")
+ibge_shp <- read_sf("dados/mestres/planet/adicionais/aois_7.shp")
+anac_shp <- read_sf("dados/mestres/planet/aois_4-08-04-2026-1510/aois_4.shp")
 
 pistas_binded <- bind_rows(pistas_shp, anac_shp, ibge_shp)
 rm(pistas_shp)
@@ -111,7 +111,7 @@ print(pares)
 
 
 ids <- pistas_dot_final$id_pista
-output_dir <- "5_base_final/screenshots/"
+output_dir <- "dados/derivados/base_final/screenshots/"
 buffer_m <- 500  # ajuste o raio do buffer aqui
 
 for (id in ids[372:length(ids)]) {
@@ -147,5 +147,5 @@ pistas_shp_sd <- pistas_shp_ilegais %>% filter(!is.na(pistas_shp_ilegais$start_d
 
 mapview(pistas_dot_sd)
 
-write_sf(pistas_dot_final %>% arrange(id_pista), "5_base_final/base_pistas_final.gpkg", layer = "pontos")
-write_sf(pistas_shp_final %>% arrange(id_pista), "5_base_final/base_pistas_final.gpkg", layer = "poligonos", append = TRUE)
+write_sf(pistas_dot_final %>% arrange(id_pista), "dados/mestres/base_pistas_final.gpkg", layer = "pontos")
+write_sf(pistas_shp_final %>% arrange(id_pista), "dados/mestres/base_pistas_final.gpkg", layer = "poligonos", append = TRUE)

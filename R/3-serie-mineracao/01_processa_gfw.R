@@ -60,7 +60,7 @@ Deter_non_min <- read_sf("Deter_non_min.gpkg")
 Deter_non_min2 <- vect(Deter_non_min)
 GFW_min_only <- mask(GFW_filtered, Deter_non_min2, inverse=TRUE)
 
-GFW_vect_fix <- read_sf("6_gfw/GFW_vectorized_fix.gpkg")
+GFW_vect_fix <- read_sf("dados/derivados/gfw/GFW_vectorized_fix.gpkg")
 
 GFW_final <- GFW_vect_fix %>% mutate(doy = as.Date(doy, origin="1970-01-01"))
 

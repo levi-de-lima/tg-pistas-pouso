@@ -4,20 +4,20 @@ library(tidyverse)
 library(spatialEco)
 library(ggplot2)
 
-Planet <- read_sf("3_planet_orders/temp_series_dissolved.gpkg") %>% rename(DATE = data)
-tile_C63L51 <- read_sf("1_fontes/area_estudo/tiles_area_estudo.shp") %>% filter(id == "C63L51")
+Planet <- read_sf("dados/mestres/planet/temp_series_dissolved.gpkg") %>% rename(DATE = data)
+tile_C63L51 <- read_sf("dados/mestres/area_estudo/tiles_area_estudo.shp") %>% filter(id == "C63L51")
 
-Deter <- read_sf("4_analise_comparativa/Alerts/Deter_sel.gpkg") %>% filter(id == "C63L51")
-# GLADL <- read_sf("4_analise_comparativa/Alerts/GLADL_sel.gpkg") %>% st_intersection(tile_C63L51)
-GLADS2 <- read_sf("4_analise_comparativa/Alerts/GLADS2_sel.gpkg") %>% st_intersection(tile_C63L51)
-GWF <- read_sf("4_analise_comparativa/Alerts/GWF_sel.gpkg") %>% st_intersection(tile_C63L51)
-LUCA <- read_sf("4_analise_comparativa/Alerts/LUCA_sel.gpkg") %>% st_intersection(tile_C63L51)
-MapBiomas <- read_sf("4_analise_comparativa/Alerts/MapBiomas_sel.gpkg") %>% filter(id == "C63L51")
-ProdesBefore <- read_sf("4_analise_comparativa/Alerts/Prodes_before_sel_class.gpkg") %>% st_intersection(tile_C63L51) %>% filter(CLASS %in% c("Deforestation_upto_2007", "yearly_deforestation"))
-Prodes <- read_sf("4_analise_comparativa/Alerts/Prodes_sel.gpkg") %>% filter(id == "C63L51") %>% rename(DATE = image_date, YEAR = year)
-RADD <- read_sf("4_analise_comparativa/Alerts/RADD_sel.gpkg") %>% st_intersection(tile_C63L51)
-SAD <- read_sf("4_analise_comparativa/Alerts/SAD.gpkg") %>% st_intersection(tile_C63L51)
-Tropisco <- read_sf("4_analise_comparativa/Alerts/Tropisco_sel.gpkg") %>% st_intersection(tile_C63L51)
+Deter <- read_sf("dados/brutos/alertas/Deter_sel.gpkg") %>% filter(id == "C63L51")
+# GLADL <- read_sf("dados/brutos/alertas/GLADL_sel.gpkg") %>% st_intersection(tile_C63L51)
+GLADS2 <- read_sf("dados/brutos/alertas/GLADS2_sel.gpkg") %>% st_intersection(tile_C63L51)
+GWF <- read_sf("dados/brutos/alertas/GWF_sel.gpkg") %>% st_intersection(tile_C63L51)
+LUCA <- read_sf("dados/brutos/alertas/LUCA_sel.gpkg") %>% st_intersection(tile_C63L51)
+MapBiomas <- read_sf("dados/brutos/alertas/MapBiomas_sel.gpkg") %>% filter(id == "C63L51")
+ProdesBefore <- read_sf("dados/brutos/alertas/Prodes_before_sel_class.gpkg") %>% st_intersection(tile_C63L51) %>% filter(CLASS %in% c("Deforestation_upto_2007", "yearly_deforestation"))
+Prodes <- read_sf("dados/brutos/alertas/Prodes_sel.gpkg") %>% filter(id == "C63L51") %>% rename(DATE = image_date, YEAR = year)
+RADD <- read_sf("dados/brutos/alertas/RADD_sel.gpkg") %>% st_intersection(tile_C63L51)
+SAD <- read_sf("dados/brutos/alertas/SAD.gpkg") %>% st_intersection(tile_C63L51)
+Tropisco <- read_sf("dados/brutos/alertas/Tropisco_sel.gpkg") %>% st_intersection(tile_C63L51)
 
 names <- list("Deter", "GLADS2", "GWF", "LUCA", "MapBiomas", "Prodes", "RADD", "SAD", "Tropisco")
 list <- list(Deter, GLADS2, GWF, LUCA, MapBiomas, Prodes, RADD, SAD, Tropisco)
@@ -78,8 +78,8 @@ for (i in 1:9) {
 
 names(list_modified) <- names
 acum_sf <- bind_rows(list_modified, .id = "alert")
-write_sf(acum_sf,"4_analise_comparativa/acumulado.gpkg")
-st_layers("acumulado.gpkg")
+write_sf(acum_sf,"dados/derivados/benchmark/acumulado.gpkg")
+st_layers("dados/derivados/benchmark/acumulado.gpkg")
 
 mapview(list_modified[[8]] %>% filter(ano_sem == 2019.5), col.regions="purple", legend=FALSE) + 
   mapview(list_modified[[8]] %>% filter(ano_sem == 2020.5), col.regions="pink", legend=FALSE) + 
@@ -164,33 +164,33 @@ mapview(list_modified[[2]] %>% filter(ano_sem == 2024.5), col.regions="purple", 
   mapview(intersections[[2]] %>% filter(ano_sem == 2024.5), col.regions="red", legend=FALSE)
 
 for (i in 1:9) {
-  write_sf(intersections[[i]], paste0("4_analise_comparativa/Intersections/",names[i],".gpkg"))
+  write_sf(intersections[[i]], paste0("dados/derivados/benchmark/Intersections/",names[i],".gpkg"))
 }
 
 for (i in 1:9) {
-  write_sf(alert_wo_planet[[i]], paste0("4_analise_comparativa/Alert-Planet/",names[i],".gpkg"))
+  write_sf(alert_wo_planet[[i]], paste0("dados/derivados/benchmark/Alert-Planet/",names[i],".gpkg"))
 }
 
 for (i in 1:9) {
-  write_sf(planet_wo_alert[[i]], paste0("4_analise_comparativa/Planet-Alert/",names[i],".gpkg"))
+  write_sf(planet_wo_alert[[i]], paste0("dados/derivados/benchmark/Planet-Alert/",names[i],".gpkg"))
 }
 
 # Alert
 processa_nome <- function(nome){
   
-  Planet_inter <- read_sf(paste0("4_analise_comparativa/Intersections/", nome, ".gpkg")) %>%
+  Planet_inter <- read_sf(paste0("dados/derivados/benchmark/Intersections/", nome, ".gpkg")) %>%
     st_transform(31981) %>%
     mutate(area = as.double(st_area(geom))) %>%
     st_transform(4674) %>%
     mutate(track = "Intersecção")
 
-  Planet_only <- read_sf(paste0("4_analise_comparativa/Planet-Alert/", nome, ".gpkg")) %>%
+  Planet_only <- read_sf(paste0("dados/derivados/benchmark/Planet-Alert/", nome, ".gpkg")) %>%
     st_transform(31981) %>%
     mutate(area = as.double(st_area(geom))) %>%
     st_transform(4674) %>%
     mutate(track = "Planet_Only")
 
-  Alert_only <- read_sf(paste0("4_analise_comparativa/Alert-Planet/", nome, ".gpkg")) %>%
+  Alert_only <- read_sf(paste0("dados/derivados/benchmark/Alert-Planet/", nome, ".gpkg")) %>%
     st_transform(31981) %>% 
     mutate(area = as.double(st_area(geom))) %>% 
     st_transform(4674) %>% 
@@ -226,7 +226,7 @@ df_plot <- df_plot %>%
   arrange(nome, track, ano_sem) %>%
   fill(area, .direction = "downup")
 
-write_sf(df_plot, "4_analise_comparativa/df_track.gpkg")
+write_sf(df_plot, "resultados/tabelas/df_track.gpkg")
 
 ggplot(df_plot, 
        aes(x = ano_sem, 

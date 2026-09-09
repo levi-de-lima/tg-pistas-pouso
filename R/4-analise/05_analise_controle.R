@@ -12,9 +12,9 @@ library(ggplot2)
 # -----------------------------------------------------------------------------
 # Carregamento
 # -----------------------------------------------------------------------------
-base_pistas  <- read_sf("5_base_final/base_pistas_final.gpkg", layer = "pontos")
+base_pistas  <- read_sf("dados/mestres/base_pistas_final.gpkg", layer = "pontos")
 
-controle <- read_sf("5_base_final/grupo_controle/controle_non_buffer.gpkg")
+controle <- read_sf("dados/derivados/base_final/grupo_controle/controle_non_buffer.gpkg")
 
 pistas_validade <- base_pistas %>%
   st_drop_geometry() %>%
@@ -95,7 +95,7 @@ p <- ggplot(
 
 
 ggsave(
-  "9_resultados/histogramas/gerais_pista/area_controle.png",
+  "resultados/figuras/analise/histogramas/gerais_pista/area_controle.png",
   p,
   width = 12,
   height = 6,

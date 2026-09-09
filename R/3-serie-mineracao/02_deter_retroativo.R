@@ -6,8 +6,8 @@ library(terra)
 library(dbscan)
 
 # 1. Carregamento e Preparação dos Dados Raster
-area_estudo <- read_sf("1_fontes/area_estudo/area_de_estudo.gpkg")
-Deter_raw <- read_sf("1_fontes/deter/Deter_before.gpkg") %>% st_intersection(area_estudo) %>% filter(CLASSNAME == "MINERACAO")
+area_estudo <- read_sf("dados/mestres/area_estudo/area_de_estudo.gpkg")
+Deter_raw <- read_sf("dados/brutos/deter/Deter_before.gpkg") %>% st_intersection(area_estudo) %>% filter(CLASSNAME == "MINERACAO")
 
 Deter <- Deter_raw %>% 
   rename(fid = fidao, doy = VIEW_DATE) %>% 
@@ -40,16 +40,16 @@ deter_area <- deter_final %>%
   filter(!st_is_empty(geom))
 sf_use_s2(TRUE)
 
-write_sf(deter_area %>% select(doy, area, geom), "7_alertas_before/deter.gpkg")
+write_sf(deter_area %>% select(doy, area, geom), "dados/derivados/deter_retroativo/deter.gpkg")
 
 Deter_c <- deter_area %>% st_make_valid() %>% filter(!st_is_empty(geom)) %>% select(doy, area, geom) %>% mutate(geom = st_centroid(geom))
 
-write_sf(Deter_c, "7_alertas_before/deter_centroides.gpkg")
+write_sf(Deter_c, "dados/derivados/deter_retroativo/deter_centroides.gpkg")
 
 
-Deter_c <- read_sf("7_alertas_before/deter_centroides.gpkg")
+Deter_c <- read_sf("dados/derivados/deter_retroativo/deter_centroides.gpkg")
 
-pistas_ponto <- read_sf("5_base_final/base_pistas_final.gpkg", layer="pontos")
+pistas_ponto <- read_sf("dados/mestres/base_pistas_final.gpkg", layer="pontos")
 
 
 coords_Deter_mat    <- st_coordinates(Deter_c %>% st_transform(31981))
@@ -68,4 +68,4 @@ for (k in 1:7) {
   Deter_c[[paste0("dist_",  k)]] <- knn_result$dist[, k]
 }
 
-write_sf(Deter_c, "deter_dist.gpkg")
+write_sf(Deter_c, "dados/derivados/deter_retroativo/deter_dist.gpkg")

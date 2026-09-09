@@ -1,97 +1,55 @@
-# ============================================================
-# Pastas de dados pesadas (não versionar)
+# ===========================================================================
+# .gitignore — estrutura de set/2026
 #
-# Todas as pastas numeradas, exceto 2_base_pistas/, contêm
-# rasters, gpkg multi-GB e produtos intermediários que devem
-# ser regenerados pelos scripts a partir das fontes externas.
-# ============================================================
-1_fontes/
-3_planet_orders/
-4_analise_comparativa/
-5_base_final/
-6_gfw/
-7_alertas_before/
-7_exploratorio/
-8_exploratorio/
-8_bfast_resultados/
+# A regra e por durabilidade, nao por extensao:
+#   dados/brutos/     fontes publicas, baixaveis de novo        -> ignorado
+#   dados/derivados/  o que o pipeline refaz                    -> ignorado
+#   dados/mestres/    pequeno e insubstituivel                  -> VERSIONADO
+#   resultados/       tabelas e figuras que entram no artigo    -> VERSIONADO
+#   _arquivo/         ramos abandonados                         -> ignorado
+#
+# Bloquear as pastas inteiras, em vez de listar extensoes, torna impossivel
+# commitar um raster de 900 MB sem querer.
+# ===========================================================================
 
-# Pasta de apresentações (pptx/pdf binários pesados)
+dados/brutos/*
+!dados/brutos/.gitkeep
+
+dados/derivados/*
+!dados/derivados/.gitkeep
+
+_arquivo/
+
+# Figuras por pista: 758 arquivos, 272 MB, regeneraveis pelos scripts da
+# etapa 4. As figuras agregadas que entram no artigo estao em
+# resultados/figuras/analise/ e essas sim sao versionadas.
+resultados/figuras/windroses/
+resultados/figuras/compostos/
+resultados/figuras/calibracao/
+dados/derivados/base_final/screenshots/
+
+# Apresentacoes: 58 MB de pptx e docx binarios, que o git nao consegue
+# versionar de forma incremental. Ficam em disco e no OneDrive.
 apresentacoes/
 
-# Pasta vazia (projeto dedicado, ambiente local)
-Projeto Dedicado - TG Pistas de Pouso/
-
-# ============================================================
-# Arquivos de sessão e temporários do R / RStudio
-# ============================================================
-.Rproj.user/
-.Rhistory
-.RData
-.RDataTmp
-.Ruserdata
-*.Rproj.user
+# Sessao R e IDE
 *.Rhistory
 *.RData
+.RDataTmp
+*.Rproj.user
+.Ruserdata
+.Renviron
 
-# ============================================================
-# Arquivos temporários do Office (lock files)
-# ============================================================
-~$*.xlsx
-~$*.xls
-~$*.pptx
-~$*.ppt
-~$*.docx
-~$*.doc
-
-# ============================================================
-# Arquivos de sistema
-# ============================================================
+# Locks do Office e arquivos de sistema
+~$*
 desktop.ini
 .DS_Store
 Thumbs.db
 
-# ============================================================
-# Rasters e arquivos GIS muito pesados (por extensão)
-# ============================================================
-*.tif
-*.tiff
-*.img
-
-# ============================================================
-# Journals e locks de bancos SQLite/GeoPackage
-# ============================================================
+# Journals de GeoPackage
 *.gpkg-journal
 *.gpkg-shm
 *.gpkg-wal
-
-# ============================================================
-# Saídas de scripts em workspace raiz (regeneráveis)
-# ============================================================
-/deter_dist.gpkg
-/GFW_final.gpkg
-
-# ============================================================
-# Arquivos comprimidos (geralmente dados brutos)
-# ============================================================
-*.zip
-*.tar.gz
-*.7z
-*.rar
-
-# ============================================================
-# GeoPackages pesados na raiz (>100MB, regeneráveis, limite do GitHub)
-# ============================================================
-/Mining_Masked_GFWclass.gpkg
-/mask_gfw.gpkg
-/mask_only_miner_gfw.gpkg
-/mask_union_gfw.gpkg
-/mask_valid_gfw.gpkg
-
-# ---------------------------------------------------------------------------
-# Ramos abandonados e duplicatas, movidos na reorganizacao de set/2026.
-# Nada foi apagado; o conteudo continua em disco, fora do controle de versao.
-# ---------------------------------------------------------------------------
-_arquivo/
 
 # Artefatos de compilacao do LaTeX
 artigo/*.aux
@@ -101,3 +59,12 @@ artigo/*.bbl
 artigo/*.blg
 artigo/*.toc
 artigo/*.synctex.gz
+
+# Rasters e comprimidos nunca vao para o git
+*.tif
+*.tiff
+*.img
+*.zip
+*.7z
+*.rar
+*.tar.gz

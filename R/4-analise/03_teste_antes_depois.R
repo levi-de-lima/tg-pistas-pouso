@@ -24,7 +24,7 @@ PARAMS <- list(
   janela      = 12
 )
 
-dir_out <- "9_resultados/v2"
+dir_out <- "resultados/figuras/analise/v2"
 dir.create(file.path(dir_out, "histogramas"), recursive = TRUE, showWarnings = FALSE)
 
 K_max <- max(PARAMS$Ks)
@@ -48,9 +48,9 @@ query_deter <- paste0(
   " AND doy < '2019-01-02'"
 )
 
-GFW_raw      <- st_read("6_gfw/GFW_dist.gpkg", query = query_gfw, quiet = TRUE)
-Deter_before <- st_read("7_alertas_before/deter_dist.gpkg", query = query_deter, quiet = TRUE)
-base_pistas  <- read_sf("5_base_final/base_pistas_final.gpkg", layer = "pontos")
+GFW_raw      <- st_read("dados/derivados/gfw/GFW_dist.gpkg", query = query_gfw, quiet = TRUE)
+Deter_before <- st_read("dados/derivados/deter_retroativo/deter_dist.gpkg", query = query_deter, quiet = TRUE)
+base_pistas  <- read_sf("dados/mestres/base_pistas_final.gpkg", layer = "pontos")
 
 cat("Detecções dentro do raio: GFW", nrow(GFW_raw), "| DETER", nrow(Deter_before), "\n")
 
